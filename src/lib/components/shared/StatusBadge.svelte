@@ -21,6 +21,11 @@
 			in_progress: { label: 'Under arbeid', tone: 'warning' },
 			done: { label: 'Løst', tone: 'success' }
 		},
+		products: {
+			active: { label: 'Aktiv', tone: 'success' },
+			hidden: { label: 'Skjult', tone: 'neutral' },
+			sold: { label: 'Solgt', tone: 'info' }
+		},
 		reviews: {
 			new: { label: 'Ubesvart', tone: 'warning' },
 			replied: { label: 'Besvart', tone: 'success' }

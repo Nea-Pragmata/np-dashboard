@@ -27,6 +27,14 @@ class AuthStore {
 	/** In-flight sync, shared so concurrent callers coalesce (see {@link #sync}). */
 	#syncInFlight: Promise<void> | null = null;
 
+	/**
+	 * SvelteKit load `fetch`, set only while {@link init} runs. The bootstrap PB
+	 * reads (authRefresh + business + membership) happen inside the root load, so
+	 * they must use the instrumented load-fetch; outside init this stays
+	 * undefined and the SDK falls back to the global fetch.
+	 */
+	#loadFetch: typeof fetch | undefined;
+
 	/** True when the signed-in user is an active agency member (NP Admin). */
 	readonly isAgency = $derived(
 		this.agencyMember?.status === AgencyMembersStatusOptions.active
@@ -51,21 +59,28 @@ class AuthStore {
 	 * Bootstrap auth from the persisted token. Call once from the root layout.
 	 * Refreshes the session, then loads the business + agency membership.
 	 */
-	async init(): Promise<void> {
+	async init(loadFetch?: typeof fetch): Promise<void> {
 		if (!pb.authStore.isValid) {
 			this.#reset();
 			return;
 		}
+		this.#loadFetch = loadFetch;
 		try {
-			await pb.collection(Collections.Users).authRefresh({ expand: 'business' });
-		} catch (e) {
-			if (e instanceof ClientResponseError && e.isAbort) return;
-			// Token is invalid/expired — drop it and fall back to logged-out.
-			pb.authStore.clear();
-			this.#reset();
-			return;
+			try {
+				await pb
+					.collection(Collections.Users)
+					.authRefresh({ expand: 'business', fetch: loadFetch });
+			} catch (e) {
+				if (e instanceof ClientResponseError && e.isAbort) return;
+				// Token is invalid/expired — drop it and fall back to logged-out.
+				pb.authStore.clear();
+				this.#reset();
+				return;
+			}
+			await this.#sync();
+		} finally {
+			this.#loadFetch = undefined;
 		}
-		await this.#sync();
 	}
 
 	async login(email: string, password: string): Promise<void> {
@@ -122,7 +137,9 @@ class AuthStore {
 			return;
 		}
 		try {
-			const biz = await pb.collection(Collections.Businesses).getOne(record.business);
+			const biz = await pb
+				.collection(Collections.Businesses)
+				.getOne(record.business, { fetch: this.#loadFetch });
 			this.business = { ...biz };
 		} catch (e) {
 			if (e instanceof ClientResponseError && e.isAbort) return;
@@ -134,7 +151,7 @@ class AuthStore {
 		try {
 			const member = await pb
 				.collection(Collections.AgencyMembers)
-				.getFirstListItem(`user = "${record.id}"`);
+				.getFirstListItem(`user = "${record.id}"`, { fetch: this.#loadFetch });
 			this.agencyMember = { ...member };
 		} catch (e) {
 			if (e instanceof ClientResponseError) {

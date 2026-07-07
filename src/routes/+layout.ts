@@ -11,7 +11,9 @@ export const ssr = false;
  * parent()` so their `auth.*` checks see the resolved session. Returns nothing
  * sensitive — auth state is read from the `auth` singleton, not from `data`.
  */
-export const load: LayoutLoad = async () => {
-	await auth.init();
+export const load: LayoutLoad = async ({ fetch }) => {
+	// Pass the load `fetch` so the bootstrap PocketBase calls use SvelteKit's
+	// instrumented fetch (avoids the dev-time "using window.fetch" warning).
+	await auth.init(fetch);
 	return {};
 };

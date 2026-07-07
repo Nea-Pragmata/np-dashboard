@@ -24,6 +24,47 @@ export function formatKr(amount: number): string {
 	return `${numberFormatter.format(amount)} kr`;
 }
 
+// Unit suffixes appended after " kr" for hourly / per-m² pricing. "stk" (per
+// item) reads as a plain amount, so it gets no suffix.
+const PRICE_UNIT_SUFFIX: Record<string, string> = {
+	time: '/time',
+	per_m2: '/m²'
+};
+
+/**
+ * Catalog price rendered per its price_type:
+ *   - fixed      → "1 250 kr"
+ *   - from       → "Fra 1 250 kr"
+ *   - on_request → "På forespørsel"
+ * A `price_unit` of `time`/`per_m2` appends "/time" / "/m²".
+ */
+export function formatCatalogPrice(
+	priceType: string,
+	price?: number | null,
+	priceUnit?: string | null
+): string {
+	if (priceType === 'on_request') return 'På forespørsel';
+	const amount = formatKr(price ?? 0);
+	const suffix = priceUnit ? (PRICE_UNIT_SUFFIX[priceUnit] ?? '') : '';
+	return priceType === 'from' ? `Fra ${amount}${suffix}` : `${amount}${suffix}`;
+}
+
+/**
+ * URL-safe slug from a Norwegian name: "Dameklipp, klipp & føn" → "dameklipp-
+ * klipp-foen". Æ/Ø/Å are transliterated; everything else non-alphanumeric
+ * collapses to single hyphens.
+ */
+export function slugify(value: string): string {
+	return value
+		.toLowerCase()
+		.trim()
+		.replace(/æ/g, 'ae')
+		.replace(/ø/g, 'oe')
+		.replace(/å/g, 'aa')
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-+|-+$/g, '');
+}
+
 const dateFormatter = new Intl.DateTimeFormat('nb-NO', {
 	weekday: 'short',
 	day: 'numeric',
@@ -111,6 +152,20 @@ const BUSINESS_TYPE_LABELS: Record<string, string> = {
 /** Human, Norwegian label for a `businesses.type` value. */
 export function businessTypeLabel(type: string): string {
 	return BUSINESS_TYPE_LABELS[type] ?? 'Bedrift';
+}
+
+// Short industry noun for the catalog's "Bransjefelter · FRISØR" section header
+// (distinct from the longer businessTypeLabel "Frisørsalong").
+const INDUSTRY_LABELS: Record<string, string> = {
+	frisor: 'Frisør',
+	bilforhandler: 'Bilforhandler',
+	tomrer: 'Tømrer',
+	annet: 'Bedrift'
+};
+
+/** Short industry noun for a `businesses.type` value (e.g. "Frisør"). */
+export function industryLabel(type: string): string {
+	return INDUSTRY_LABELS[type] ?? 'Bedrift';
 }
 
 /** Norwegian role label; agency members read differently from tenant users. */
