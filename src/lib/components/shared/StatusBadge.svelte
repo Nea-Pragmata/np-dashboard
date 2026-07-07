@@ -19,7 +19,7 @@
 		inquiries: {
 			new: { label: 'Ny', tone: 'info' },
 			in_progress: { label: 'Under arbeid', tone: 'warning' },
-			done: { label: 'Løst', tone: 'success' }
+			done: { label: 'Fullført', tone: 'success' }
 		},
 		products: {
 			active: { label: 'Aktiv', tone: 'success' },

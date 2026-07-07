@@ -4,7 +4,8 @@ Append-only working log across build agents. Decisions of record go to Notion (a
 
 ## Status
 
-- **Current milestone:** M5 DONE (2026-07-07, Booking — calendar/appointments/drawer/realtime/settings; Chrome-validated, footer-snippet blocker fixed + re-verified). Committed M0/M2/M3/M4/M5. Next: M6 (Henvendelser). Booking-time convention = UTC wall-clock (formatTime, matches seed). M0 security gate S1 passed.
+- **Current milestone:** M6 DONE (2026-07-07, Henvendelser — unified inbox, honest reply composer via mailto, designed empty+error states, status flow, badge consistency). Chrome-validated PASS. Committed M0/M2/M3/M4/M5/M6. Next: M7 (Kunder — will resolve the /kunder deep-link from inquiry detail). Booking-time convention = UTC wall-clock (formatTime). M0 security gate S1 passed.
+- Known non-blocking issues (documented, not yet fixed): (a) hard page reload while PB is fully down logs the user out (root auth.init clears token on any authRefresh failure incl. network) instead of showing the error state — acceptable degradation; in-session client-nav error state works. (b) benign `net::ERR_ABORTED` on some mutations from realtime + invalidateAll double-refetch (SDK auto-cancel; cosmetic). (c) minor a11y: reply Textarea + a few inputs lack id/name (aria-label present). Revisit in M14 polish.
 - M0 result: 30 base collections + 5 views + users, full rules matrix (155/155), 4 demo tenants seeded, probe artifacts cleaned (60 link_events). `pocketbase` SDK + `pocketbase-typegen` installed; `bun run check` green. Types in `src/lib/pocketbase-types.ts`.
 - Plan: `~/.claude/plans/oppdraget-bygg-np-dashboard-reactive-gizmo.md`
 - Schema fasit (working copy of Notion v2): `docs/pb-schema.md`
