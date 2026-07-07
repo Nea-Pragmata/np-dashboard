@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "pocketbase": {
+      "command": "docker",
+      "args": ["run", "--rm", "-i", "--env-file", "/Users/mats/development/pocketbase_mcp_server/.env", "pocketbasemcpserver"]
+    }
+  }
+}
