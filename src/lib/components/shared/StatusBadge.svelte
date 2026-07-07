@@ -37,6 +37,59 @@
 			error: { label: 'Feil', tone: 'error' },
 			missing: { label: 'Mangler', tone: 'warning' },
 			unknown: { label: 'Ukjent', tone: 'neutral' }
+		},
+		campaigns: {
+			draft: { label: 'Utkast', tone: 'neutral' },
+			scheduled: { label: 'Planlagt', tone: 'info' },
+			sent: { label: 'Sendt', tone: 'success' }
+		},
+		social_posts: {
+			draft: { label: 'Utkast', tone: 'neutral' },
+			pending_approval: { label: 'Til godkjenning', tone: 'warning' },
+			approved: { label: 'Godkjent', tone: 'info' },
+			published: { label: 'Publisert', tone: 'success' }
+		},
+		pages: {
+			published: { label: 'Publisert', tone: 'success' },
+			draft: { label: 'Utkast', tone: 'neutral' }
+		},
+		forms: {
+			active: { label: 'Aktivt', tone: 'success' },
+			draft: { label: 'Utkast', tone: 'neutral' }
+		},
+		businesses: {
+			active: { label: 'Aktiv', tone: 'success' },
+			onboarding: { label: 'Onboarding', tone: 'info' },
+			paused: { label: 'Pauset', tone: 'warning' }
+		},
+		subscriptions: {
+			active: { label: 'Aktivt', tone: 'success' },
+			paused: { label: 'Pauset', tone: 'warning' },
+			ended: { label: 'Avsluttet', tone: 'neutral' }
+		},
+		integrations: {
+			connected: { label: 'Tilkoblet', tone: 'success' },
+			error: { label: 'Feil', tone: 'error' },
+			not_connected: { label: 'Ikke tilkoblet', tone: 'neutral' }
+		},
+		ai_jobs: {
+			active: { label: 'Aktiv', tone: 'success' },
+			paused: { label: 'Pauset', tone: 'neutral' }
+		},
+		ai_job_runs: {
+			ok: { label: 'OK', tone: 'success' },
+			findings: { label: 'Funn', tone: 'warning' },
+			error: { label: 'Feil', tone: 'error' }
+		},
+		agency_tasks: {
+			open: { label: 'Åpen', tone: 'warning' },
+			done: { label: 'Fullført', tone: 'success' }
+		},
+		waitlist_entries: {
+			waiting: { label: 'Venter', tone: 'warning' },
+			notified: { label: 'Varslet', tone: 'info' },
+			booked: { label: 'Booket', tone: 'success' },
+			expired: { label: 'Utløpt', tone: 'neutral' }
 		}
 	};
 
