@@ -407,7 +407,7 @@
 								Kunde
 							</p>
 							<a
-								href="/kunder"
+								href="/kunder/{selected.expand.customer.id}"
 								class="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-accent-blue-text outline-none transition-colors hover:underline focus-visible:ring-2 focus-visible:ring-ring"
 							>
 								{selected.expand.customer.name}

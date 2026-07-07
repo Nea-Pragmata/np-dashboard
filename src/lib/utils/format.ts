@@ -76,6 +76,27 @@ export function formatDate(date: DateInput): string {
 	return dateFormatter.format(toDate(date));
 }
 
+const monthYearFormatter = new Intl.DateTimeFormat('nb-NO', {
+	month: 'long',
+	year: 'numeric'
+});
+
+/** "mars 2024" — long month + year (e.g. «Kunde siden mars 2024»). */
+export function formatMonthYear(date: DateInput): string {
+	return monthYearFormatter.format(toDate(date));
+}
+
+const fullDateFormatter = new Intl.DateTimeFormat('nb-NO', {
+	day: 'numeric',
+	month: 'long',
+	year: 'numeric'
+});
+
+/** "12. mars 2024" — numeric day, long month, year (no weekday). */
+export function formatDateFull(date: DateInput): string {
+	return fullDateFormatter.format(toDate(date));
+}
+
 const dateTimeFormatter = new Intl.DateTimeFormat('nb-NO', {
 	weekday: 'short',
 	day: 'numeric',
