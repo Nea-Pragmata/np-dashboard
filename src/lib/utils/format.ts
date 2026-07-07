@@ -10,13 +10,18 @@ function toDate(value: DateInput): Date {
 	return value instanceof Date ? value : new Date(value);
 }
 
-const krFormatter = new Intl.NumberFormat('nb-NO', {
+const numberFormatter = new Intl.NumberFormat('nb-NO', {
 	maximumFractionDigits: 0
 });
 
-/** "1 250 kr" — space-grouped, no decimals, suffixed with " kr". */
+/** "1 248" — space-grouped integer (nb-NO thousands separator), no decimals. */
+export function formatNumber(value: number): string {
+	return numberFormatter.format(value);
+}
+
+/** "1 250 kr" — {@link formatNumber} suffixed with " kr". */
 export function formatKr(amount: number): string {
-	return `${krFormatter.format(amount)} kr`;
+	return `${numberFormatter.format(amount)} kr`;
 }
 
 const dateFormatter = new Intl.DateTimeFormat('nb-NO', {
@@ -41,6 +46,21 @@ const dateTimeFormatter = new Intl.DateTimeFormat('nb-NO', {
 /** "man. 6. juli, 09:00" — {@link formatDate} plus 24h time. */
 export function formatDateTime(date: DateInput): string {
 	return dateTimeFormatter.format(toDate(date));
+}
+
+// Renders the stored wall-clock time in UTC. Booking times are currently seeded
+// as literal UTC ("09:00" → 09:00Z), so formatting in UTC yields the intended
+// local clock (09:00) rather than a +offset shift. The definitive booking
+// timezone handling is deferred to the booking milestone (see docs/LEDGER.md).
+const timeFormatter = new Intl.DateTimeFormat('nb-NO', {
+	hour: '2-digit',
+	minute: '2-digit',
+	timeZone: 'UTC'
+});
+
+/** "09:00" — 24h wall-clock time (see {@link timeFormatter} on timezone). */
+export function formatTime(date: DateInput): string {
+	return timeFormatter.format(toDate(date));
 }
 
 const relativeFormatter = new Intl.RelativeTimeFormat('nb-NO', { numeric: 'auto' });
