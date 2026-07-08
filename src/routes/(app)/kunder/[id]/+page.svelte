@@ -1,19 +1,23 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import Phone from '@lucide/svelte/icons/phone';
 	import Mail from '@lucide/svelte/icons/mail';
 	import Plus from '@lucide/svelte/icons/plus';
 	import CalendarDays from '@lucide/svelte/icons/calendar-days';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
+	import Download from '@lucide/svelte/icons/download';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import { toast } from 'svelte-sonner';
 	import { Button } from '$lib/components/ui/button';
 	import { Switch } from '$lib/components/ui/switch';
 	import { Badge } from '$lib/components/ui/badge';
 	import StatusBadge from '$lib/components/shared/StatusBadge.svelte';
 	import EmptyState from '$lib/components/shared/EmptyState.svelte';
+	import ConfirmDialog from '$lib/components/shared/ConfirmDialog.svelte';
 	import CustomerDrawer from '../CustomerDrawer.svelte';
 	import { pb } from '$lib/pb';
+	import { auth } from '$lib/stores/auth.svelte';
 	import { Collections, BookingsStatusOptions } from '$lib/pocketbase-types';
 	import {
 		formatDate,
@@ -22,7 +26,8 @@
 		formatMonthYear,
 		formatNumber,
 		formatTime,
-		initials
+		initials,
+		slugify
 	} from '$lib/utils/format';
 	import { pbError } from '$lib/utils/errors';
 	import { cn } from '$lib/utils.js';
@@ -201,6 +206,103 @@
 		return invalidateAll();
 	}
 
+	// --- personvern: eksport + anonymiserende sletting (GDPR) ----------------
+	// The customer's PII is denormalized onto bookings/inquiries and referenced
+	// from waitlist_entries, so a plain delete of the customers row leaves their
+	// name/phone/email behind. Both actions below fetch all three related sets
+	// fresh (they're not module-gated at the API level, unlike the page loader).
+	const isOwner = $derived(auth.user?.role === 'owner');
+
+	/** getFullList the three collections that reference this customer. */
+	function relatedFor(id: string) {
+		const q = { filter: `customer = "${id}"`, requestKey: null } as const;
+		return Promise.all([
+			pb.collection(Collections.Bookings).getFullList(q),
+			pb.collection(Collections.Inquiries).getFullList(q),
+			pb.collection(Collections.WaitlistEntries).getFullList(q)
+		]);
+	}
+
+	// (b) Right to access/portability: raw stored records → one JSON file.
+	async function downloadData() {
+		try {
+			const [bookings, inquiries, waitlist] = await relatedFor(customer.id);
+			// Honest export: the raw records as stored, no reshaping.
+			const payload = {
+				exported_at: new Date().toISOString(),
+				customer,
+				bookings,
+				inquiries,
+				waitlist_entries: waitlist
+			};
+			const url = URL.createObjectURL(
+				new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+			);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = `kunde-${slugify(customer.name) || customer.id}.json`;
+			document.body.append(a);
+			a.click();
+			a.remove();
+			URL.revokeObjectURL(url);
+			toast.success('Kundedata er lastet ned.');
+		} catch (e) {
+			toast.error(pbError(e));
+		}
+	}
+
+	// (a) Right to erasure: scrub the denormalized PII everywhere, then delete.
+	let eraseOpen = $state(false);
+	let erasing = $state(false);
+	async function eraseCustomer() {
+		const id = customer.id;
+		erasing = true;
+		try {
+			const [bookings, inquiries, waitlist] = await relatedFor(id);
+			// ponytail: client-side loop — fine for demo/SMB volumes (a handful of
+			// rows per customer). Ceiling: not atomic; a mid-way failure leaves a
+			// partial scrub. A PocketBase batch/hook would be atomic for large sets,
+			// but that needs server config not worth it at this scale.
+			const opt = { requestKey: null } as const;
+			// 1. Bookings: scrub the denormalized contact fields. Never send
+			//    business/deposit/payment — the bookings update rule forbids them.
+			await Promise.all(
+				bookings.map((b) =>
+					pb.collection(Collections.Bookings).update(
+						b.id,
+						{ customer: '', customer_name: 'Anonymisert kunde', customer_email: '', customer_phone: '' },
+						opt
+					)
+				)
+			);
+			// 2. Inquiries: name + email are REQUIRED, so overwrite (not blank);
+			//    the email must stay a valid format.
+			await Promise.all(
+				inquiries.map((i) =>
+					pb.collection(Collections.Inquiries).update(
+						i.id,
+						{ customer: '', name: 'Anonymisert kunde', email: 'anonymisert@slettet.local', phone: '' },
+						opt
+					)
+				)
+			);
+			// 3. Waitlist: only a relation to clear (no denormalized PII on the row).
+			await Promise.all(
+				waitlist.map((w) =>
+					pb.collection(Collections.WaitlistEntries).update(w.id, { customer: '' }, opt)
+				)
+			);
+			// 4. Finally remove the customer card (owner-only per the EE delete rule).
+			await pb.collection(Collections.Customers).delete(id);
+
+			toast.success('Kunden er slettet og anonymisert.');
+			await goto('/kunder');
+		} catch (e) {
+			toast.error(pbError(e));
+			erasing = false;
+		}
+	}
+
 	const cardClass = 'rounded-lg border border-border bg-card p-6';
 	const h3 = 'text-base font-semibold text-foreground';
 	const capsLabel =
@@ -348,6 +450,32 @@
 					</div>
 				{/if}
 			</section>
+
+			<!-- Personvern (GDPR) -->
+			<section class={cn(cardClass, 'flex flex-col gap-3')}>
+				<h2 class={h3}>Personvern</h2>
+				<p class="text-sm text-text-subtle">
+					Last ned alt som er lagret om kunden, eller fjern kunden og anonymiser navn og
+					kontaktinfo i bookinger og henvendelser.
+				</p>
+				<div class="flex flex-col gap-2 pt-1">
+					<Button variant="outline" onclick={downloadData} class="justify-start">
+						<Download class="size-4" />
+						Last ned kundedata
+					</Button>
+					{#if isOwner}
+						<Button
+							variant="outline"
+							onclick={() => (eraseOpen = true)}
+							disabled={erasing}
+							class="justify-start text-destructive hover:text-destructive"
+						>
+							<Trash2 class="size-4" />
+							Slett og anonymiser
+						</Button>
+					{/if}
+				</div>
+			</section>
 		</div>
 
 		<!-- Høyrekolonne -->
@@ -433,3 +561,12 @@
 </div>
 
 <CustomerDrawer bind:open={drawerOpen} {customer} {businessId} onsaved={refresh} />
+<ConfirmDialog
+	bind:open={eraseOpen}
+	title="Slett og anonymiser kunde?"
+	description="Navn og kontaktinfo fjernes fra bookinger og henvendelser, og kundekortet slettes. Dette kan ikke angres."
+	confirmLabel="Slett og anonymiser"
+	cancelLabel="Avbryt"
+	destructive
+	onconfirm={eraseCustomer}
+/>
