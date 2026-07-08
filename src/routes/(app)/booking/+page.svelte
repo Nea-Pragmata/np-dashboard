@@ -17,7 +17,9 @@
 	import StatusBadge from '$lib/components/shared/StatusBadge.svelte';
 	import EmptyState from '$lib/components/shared/EmptyState.svelte';
 	import WeekCalendar from './WeekCalendar.svelte';
+	import BookingDayView from './BookingDayView.svelte';
 	import BookingDrawer from './BookingDrawer.svelte';
+	import Fab from '$lib/components/layout/Fab.svelte';
 	import { pb } from '$lib/pb';
 	import { Collections, BookingsStatusOptions } from '$lib/pocketbase-types';
 	import { formatDate, formatTime } from '$lib/utils/format';
@@ -81,6 +83,46 @@
 		`Uke ${isoWeekNumber(monday)} · ${rangeFmt.format(monday)} – ${rangeFmt.format(addDays(monday, 6))}`
 	);
 
+	// --- selected day (mobile agenda) ----------------------------------------
+	// Day navigation stays client-side while the day is inside the loaded week;
+	// crossing the boundary re-loads via `goto` (?uke + ?dag).
+	const fullDayFmt = new Intl.DateTimeFormat('nb-NO', {
+		weekday: 'long',
+		day: 'numeric',
+		month: 'long',
+		timeZone: 'UTC'
+	});
+	// A local day override (set by within-week day nav) wins over the loaded day.
+	// It is cleared only when the loaded WEEK changes, so a same-week realtime
+	// invalidation never snaps the agenda back off the day the user is viewing.
+	let dayOverride = $state<string | null>(null);
+	let seededWeek: string | undefined;
+	$effect(() => {
+		const wk = data.weekStartIso;
+		if (wk !== seededWeek) {
+			seededWeek = wk;
+			dayOverride = null;
+		}
+	});
+	const selectedDayIso = $derived(dayOverride ?? data.selectedDayIso);
+	const selectedDayLabel = $derived.by(() => {
+		const d = parseIsoDate(selectedDayIso);
+		return d ? fullDayFmt.format(d) : '';
+	});
+	const selectedIsToday = $derived(selectedDayIso === todayIso);
+
+	function goToDay(iso: string) {
+		if (iso >= days[0].iso && iso <= days[6].iso) {
+			dayOverride = iso;
+		} else {
+			const mondayIso = isoDate(weekStart(parseIsoDate(iso) ?? new Date()));
+			goto(`/booking?uke=${mondayIso}&dag=${iso}`, { keepFocus: true, noScroll: true });
+		}
+	}
+	const dayPrev = () => goToDay(isoDate(addDays(parseIsoDate(selectedDayIso) ?? new Date(), -1)));
+	const dayNext = () => goToDay(isoDate(addDays(parseIsoDate(selectedDayIso) ?? new Date(), 1)));
+	const dayToday = () => goToDay(todayIso);
+
 	// Grid hour range = union of the week's opening hours and its bookings.
 	const hourRange = $derived.by(() => {
 		let min = Infinity;
@@ -126,6 +168,12 @@
 
 	const calendarBookings = $derived(
 		staffFilter === 'all' ? bookings : bookings.filter((b) => b.staff === staffFilter)
+	);
+	// The selected day's bookings (staff-filtered), sorted, for the mobile agenda.
+	const dayBookings = $derived(
+		calendarBookings
+			.filter((b) => isoDate(new Date(b.start)) === selectedDayIso)
+			.sort((a, b) => a.start.localeCompare(b.start))
 	);
 	const listBookings = $derived(
 		bookings.filter((b) => {
@@ -215,11 +263,9 @@
 		}
 	}
 
-	// Default date for a new booking: today if it falls inside the viewed week,
-	// otherwise the Monday of that week.
-	const newBookingDate = $derived(
-		todayIso >= days[0].iso && todayIso <= days[6].iso ? todayIso : days[0].iso
-	);
+	// Default date for a new booking: the selected day (today if inside the viewed
+	// week, else its Monday — and on mobile, whichever day the agenda is showing).
+	const newBookingDate = $derived(selectedDayIso);
 
 	const triggerClass =
 		'flex size-8 items-center justify-center rounded-md text-text-subtle outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring';
@@ -234,7 +280,11 @@
 			<h1 class="text-2xl font-semibold text-foreground">Booking</h1>
 			<p class="mt-1 text-sm text-muted-foreground">Timene og avtalene for {businessName}.</p>
 		</div>
-		<Button variant={headerPrimary ? 'default' : 'outline'} onclick={openNew}>
+		<Button
+			variant={headerPrimary ? 'default' : 'outline'}
+			onclick={openNew}
+			class="hidden md:inline-flex"
+		>
 			<Plus class="size-4" />
 			Ny avtale
 		</Button>
@@ -265,9 +315,10 @@
 		</a>
 	</div>
 
-	<!-- Verktøylinje: ukenavigator + ansatt-filter -->
+	<!-- Verktøylinje: ukenavigator + ansatt-filter. På mobil erstattes ukenavigatoren
+	     av dagnavigatoren i agendavisningen (Kalender-fanen). -->
 	<div class="flex flex-wrap items-center justify-between gap-3">
-		<div class="flex items-center gap-2">
+		<div class={cn('items-center gap-2', activeTab === 'kalender' ? 'hidden md:flex' : 'flex')}>
 			<Button variant="outline" size="sm" onclick={goToday}>I dag</Button>
 			<div class="flex items-center">
 				<Button variant="outline" size="icon" class="rounded-r-none" aria-label="Forrige uke" onclick={goPrev}>
@@ -299,7 +350,7 @@
 	{#if activeTab === 'kalender'}
 		<!-- KALENDER -->
 		{#if isLoading}
-			<div class="rounded-xl border border-border bg-card p-4">
+			<div class="rounded-lg border border-border bg-card p-4">
 				<div class="grid gap-2" style="grid-template-columns: 52px repeat(7, 1fr);">
 					{#each Array(8 * 7) as _, i (i)}
 						<Skeleton class="h-10 w-full" />
@@ -307,7 +358,20 @@
 				</div>
 			</div>
 		{:else}
-			<div class="relative rounded-xl border border-border bg-card">
+			<!-- Mobil: dagsvisning (agenda) -->
+			<div class="md:hidden">
+				<BookingDayView
+					bookings={dayBookings}
+					dayLabel={selectedDayLabel}
+					isToday={selectedIsToday}
+					onselect={openBooking}
+					onPrev={dayPrev}
+					onNext={dayNext}
+					onToday={dayToday}
+				/>
+			</div>
+			<!-- Desktop: ukesnett -->
+			<div class="relative hidden rounded-lg border border-border bg-card md:block">
 				<WeekCalendar
 					{days}
 					bookings={calendarBookings}
@@ -453,3 +517,6 @@
 	defaultDateIso={newBookingDate}
 	onsaved={refresh}
 />
+
+<!-- Mobil primærhandling: «Ny avtale» (header-knappen skjules på mobil). -->
+<Fab onclick={openNew} label="Ny avtale" />

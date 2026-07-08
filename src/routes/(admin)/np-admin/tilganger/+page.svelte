@@ -219,7 +219,7 @@
 
 	<!-- Info: roller + synlighet -->
 	<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-		<section class="flex flex-col gap-3 rounded-xl border border-border bg-card p-5">
+		<section class="flex flex-col gap-3 rounded-lg border border-border bg-card p-5">
 			<h2 class="text-base font-semibold text-foreground">Roller</h2>
 			<dl class="flex flex-col gap-2.5">
 				<div class="flex items-start gap-3">
@@ -248,7 +248,7 @@
 				</div>
 			</dl>
 		</section>
-		<section class="flex flex-col gap-3 rounded-xl border border-border bg-card p-5">
+		<section class="flex flex-col gap-3 rounded-lg border border-border bg-card p-5">
 			<h2 class="text-base font-semibold text-foreground">Synlighet i kundedashbordet</h2>
 			<p class="text-sm text-muted-foreground">
 				Punktet «NP Admin» i kundens meny vises bare for byråbrukere som er logget inn hos kunden.

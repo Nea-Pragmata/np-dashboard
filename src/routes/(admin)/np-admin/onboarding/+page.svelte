@@ -157,7 +157,7 @@
 		}
 	}
 
-	const cardClass = 'flex flex-col gap-5 rounded-xl border border-border bg-card p-6';
+	const cardClass = 'flex flex-col gap-5 rounded-lg border border-border bg-card p-6';
 	const sectionTitle = 'text-base font-semibold text-foreground';
 	const enabledCount = $derived(MODULE_KEYS.filter((k) => modules[k]).length);
 </script>
@@ -174,7 +174,7 @@
 	</header>
 
 	{#if !isOwner}
-		<div class="rounded-xl border border-border bg-card">
+		<div class="rounded-lg border border-border bg-card">
 			<EmptyState
 				icon={ShieldAlert}
 				title="Kun byråeier kan opprette bedrifter"
@@ -301,7 +301,7 @@
 
 			<!-- Right: menu preview (1/3) -->
 			<aside class="lg:col-span-1">
-				<div class="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 lg:sticky lg:top-6">
+				<div class="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 lg:sticky lg:top-6">
 					<div class="flex flex-col gap-1">
 						<h2 class={sectionTitle}>Slik blir menyen</h2>
 						<p class="text-sm text-muted-foreground">

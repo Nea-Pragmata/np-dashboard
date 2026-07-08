@@ -298,7 +298,7 @@
 			{#if isLoading}
 				<div class="flex flex-col gap-4">
 					{#each skeletonCards as c (c)}
-						<div class="flex flex-col gap-3 rounded-xl border border-border bg-card p-5">
+						<div class="flex flex-col gap-3 rounded-lg border border-border bg-card p-5">
 							<div class="flex items-start gap-3">
 								<Skeleton class="size-6 shrink-0 rounded-full" />
 								<div class="flex flex-1 flex-col gap-1.5">
@@ -312,7 +312,7 @@
 					{/each}
 				</div>
 			{:else if filtered.length === 0}
-				<div class="flex flex-1 items-center justify-center rounded-xl border border-border bg-card">
+				<div class="flex flex-1 items-center justify-center rounded-lg border border-border bg-card">
 					{#if reviews.length === 0}
 						<EmptyState
 							icon={Star}
@@ -330,7 +330,7 @@
 			{:else}
 				<div class="flex flex-col gap-4">
 					{#each filtered as review (review.id)}
-						<article class="flex flex-col gap-3 rounded-xl border border-border bg-card p-5">
+						<article class="flex flex-col gap-3 rounded-lg border border-border bg-card p-5">
 							<!-- Hode -->
 							<div class="flex items-start gap-3">
 								<span
@@ -424,7 +424,7 @@
 		<!-- Høyre kolonne: be om anmeldelse + tilkoblinger -->
 		<aside class="flex w-full flex-col gap-6 lg:w-[360px] lg:shrink-0">
 			<!-- Be om anmeldelse -->
-			<section class="flex flex-col gap-3 rounded-xl border border-border bg-card p-6">
+			<section class="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
 				<h2 class="text-base font-semibold text-foreground">Be om anmeldelse</h2>
 				<div class="flex items-center gap-3">
 					<Switch
@@ -471,7 +471,7 @@
 			</section>
 
 			<!-- Tilkoblinger -->
-			<section class="flex flex-col gap-3 rounded-xl border border-border bg-card p-6">
+			<section class="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
 				<h2 class="text-base font-semibold text-foreground">Tilkoblinger</h2>
 				<div class="flex items-center justify-between gap-3">
 					<span class="text-sm text-text-body">Google Business-profil</span>

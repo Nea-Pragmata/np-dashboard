@@ -124,7 +124,7 @@
 		<!-- Left: type groups + attribute schema overview -->
 		<div class="flex flex-col gap-6 lg:col-span-1">
 			<!-- Innholdsmaler -->
-			<section class="flex flex-col overflow-hidden rounded-xl border border-border bg-card">
+			<section class="flex flex-col overflow-hidden rounded-lg border border-border bg-card">
 				<div class="border-b border-border px-4 py-3">
 					<h2 class="text-sm font-semibold text-foreground">Innholdsmaler</h2>
 				</div>
@@ -159,7 +159,7 @@
 			</section>
 
 			<!-- Attributt-skjemaer (read-only overview) -->
-			<section class="flex flex-col overflow-hidden rounded-xl border border-border bg-card">
+			<section class="flex flex-col overflow-hidden rounded-lg border border-border bg-card">
 				<div class="border-b border-border px-4 py-3">
 					<h2 class="text-sm font-semibold text-foreground">Attributt-skjemaer</h2>
 				</div>
@@ -186,7 +186,7 @@
 		</div>
 
 		<!-- Right: templates of the selected type -->
-		<section class="flex flex-col overflow-hidden rounded-xl border border-border bg-card lg:col-span-2">
+		<section class="flex flex-col overflow-hidden rounded-lg border border-border bg-card lg:col-span-2">
 			<div class="flex items-start justify-between gap-3 border-b border-border p-4">
 				<div class="min-w-0">
 					<h2 class="text-base font-semibold text-foreground">{selectedMeta.label}</h2>

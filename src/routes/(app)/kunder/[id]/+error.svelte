@@ -33,7 +33,7 @@
 	</header>
 
 	<div
-		class="flex items-center justify-center overflow-hidden rounded-xl border border-border bg-card"
+		class="flex items-center justify-center overflow-hidden rounded-lg border border-border bg-card"
 	>
 		<div class="flex flex-col items-center gap-2 px-6 py-16 text-center">
 			<span class="flex size-12 items-center justify-center rounded-full bg-error-bg text-error">

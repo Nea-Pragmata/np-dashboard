@@ -257,7 +257,7 @@
 		<!-- Listekort -->
 		<div
 			class={cn(
-				'min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-card lg:w-[400px] lg:shrink-0',
+				'min-h-0 flex-col overflow-hidden rounded-lg border border-border bg-card lg:w-[400px] lg:shrink-0',
 				mobileDetailOpen ? 'hidden lg:flex' : 'flex'
 			)}
 		>
@@ -334,7 +334,7 @@
 		<!-- Detaljkort -->
 		<div
 			class={cn(
-				'min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card',
+				'min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-border bg-card',
 				mobileDetailOpen ? 'flex' : 'hidden lg:flex'
 			)}
 		>

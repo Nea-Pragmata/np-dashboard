@@ -201,7 +201,7 @@
 		return invalidateAll();
 	}
 
-	const cardClass = 'rounded-xl border border-border bg-card p-6';
+	const cardClass = 'rounded-lg border border-border bg-card p-6';
 	const h3 = 'text-base font-semibold text-foreground';
 	const capsLabel =
 		'text-[11px] font-medium uppercase tracking-[0.06em] text-text-subtle';
@@ -374,7 +374,7 @@
 			{/if}
 
 			<!-- Historikk -->
-			<section class="overflow-hidden rounded-xl border border-border bg-card">
+			<section class="overflow-hidden rounded-lg border border-border bg-card">
 				<div class="px-6 pb-2 pt-6">
 					<h2 class={h3}>Historikk</h2>
 				</div>

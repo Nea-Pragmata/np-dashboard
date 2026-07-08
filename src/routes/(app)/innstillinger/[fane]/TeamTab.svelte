@@ -87,7 +87,7 @@
 
 <div class="flex flex-col gap-3">
 	{#if users.length === 0}
-		<div class="rounded-xl border border-border bg-card">
+		<div class="rounded-lg border border-border bg-card">
 			<EmptyState
 				icon={Users}
 				title="Ingen brukere ennå"
@@ -95,7 +95,7 @@
 			/>
 		</div>
 	{:else}
-		<div class="overflow-x-auto rounded-xl border border-border bg-card">
+		<div class="overflow-x-auto rounded-lg border border-border bg-card">
 			<div class="min-w-[720px]">
 				<!-- Header -->
 				<div class="flex h-10 items-center gap-3 px-4">

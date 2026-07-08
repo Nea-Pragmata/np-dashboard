@@ -108,7 +108,7 @@
 		toast.info('Ta kontakt med NP, så setter vi det opp for deg.');
 	}
 
-	const cardClass = 'flex flex-col gap-4 rounded-xl border border-border bg-card p-6';
+	const cardClass = 'flex flex-col gap-4 rounded-lg border border-border bg-card p-6';
 	const cardTitle = 'text-base font-semibold text-foreground';
 	const capsLabel = 'text-[11px] font-medium uppercase tracking-[0.06em] text-muted-foreground';
 </script>
@@ -278,7 +278,7 @@
 			</section>
 
 			<!-- Trenger du mer? -->
-			<section class="flex flex-col gap-2 rounded-xl border border-border bg-card p-6">
+			<section class="flex flex-col gap-2 rounded-lg border border-border bg-card p-6">
 				<h2 class={cardTitle}>Trenger du mer?</h2>
 				<p class="text-sm text-text-body">
 					Vil du prøve annonser eller venteliste? Ta kontakt, så setter vi det opp.

@@ -182,7 +182,7 @@
 		}
 	}
 
-	const cardClass = 'flex flex-col gap-5 rounded-xl border border-border bg-card p-6';
+	const cardClass = 'flex flex-col gap-5 rounded-lg border border-border bg-card p-6';
 	const cardTitle = 'text-lg font-semibold text-foreground';
 	const switchRow = 'flex items-center gap-3';
 	const triggerClass =

@@ -48,7 +48,7 @@
 	<!-- Hovedrad: feilkort + tomt detaljkort -->
 	<div class="flex min-h-0 flex-1 flex-col gap-6 lg:flex-row">
 		<div
-			class="flex min-h-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-card lg:w-[400px] lg:shrink-0"
+			class="flex min-h-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-card lg:w-[400px] lg:shrink-0"
 		>
 			<div class="flex flex-col items-center gap-2 px-6 py-12 text-center">
 				<span
@@ -68,7 +68,7 @@
 			</div>
 		</div>
 		<div
-			class="hidden min-h-0 flex-1 items-center justify-center overflow-hidden rounded-xl border border-border bg-card p-6 lg:flex"
+			class="hidden min-h-0 flex-1 items-center justify-center overflow-hidden rounded-lg border border-border bg-card p-6 lg:flex"
 		>
 			<p class="text-sm text-text-subtle">Velg en henvendelse i listen</p>
 		</div>

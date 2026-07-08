@@ -152,7 +152,7 @@
 	<!-- Oppgaver -->
 	<section class="flex flex-col gap-3">
 		<h2 class="text-base font-semibold text-foreground">Oppgaver</h2>
-		<div class="overflow-hidden rounded-xl border border-border bg-card">
+		<div class="overflow-hidden rounded-lg border border-border bg-card">
 			{#if sortedTasks.length === 0}
 				<EmptyState
 					icon={ClipboardList}

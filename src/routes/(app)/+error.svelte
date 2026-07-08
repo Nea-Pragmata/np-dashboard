@@ -21,7 +21,7 @@
 
 <div class="flex h-full items-center justify-center p-4 sm:p-6 lg:p-8">
 	<div
-		class="flex w-full max-w-md flex-col items-center gap-2 rounded-xl border border-border bg-card px-6 py-12 text-center"
+		class="flex w-full max-w-md flex-col items-center gap-2 rounded-lg border border-border bg-card px-6 py-12 text-center"
 	>
 		<span class="flex size-12 items-center justify-center rounded-full bg-error-bg text-error">
 			<CircleAlert class="size-[22px]" />

@@ -114,7 +114,7 @@
 
 	<!-- Byrået publiserer — prominent note -->
 	<div
-		class="flex items-start gap-2.5 rounded-xl bg-accent-blue-bg px-4 py-3 text-sm text-accent-blue-text"
+		class="flex items-start gap-2.5 rounded-lg bg-accent-blue-bg px-4 py-3 text-sm text-accent-blue-text"
 	>
 		<Info class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
 		<p>
@@ -126,7 +126,7 @@
 	<!-- Kolonner -->
 	<div class="flex flex-col gap-6 lg:flex-row lg:items-start">
 		<!-- Venstre: sider på nettsiden -->
-		<section class="min-w-0 flex-1 overflow-hidden rounded-xl border border-border bg-card">
+		<section class="min-w-0 flex-1 overflow-hidden rounded-lg border border-border bg-card">
 			<div class="px-6 pb-3 pt-6">
 				<h2 class="text-base font-semibold text-foreground">Sider på nettsiden</h2>
 			</div>
@@ -174,7 +174,7 @@
 		<aside class="flex shrink-0 flex-col gap-6 lg:w-96">
 			{#if isLoading}
 				{#each [0, 1, 2] as c (c)}
-					<div class="flex flex-col gap-3 rounded-xl border border-border bg-card p-6">
+					<div class="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
 						<Skeleton class="h-5 w-32" />
 						<Skeleton class="h-3.5 w-full" />
 						<Skeleton class="h-3.5 w-3/4" />
@@ -182,7 +182,7 @@
 				{/each}
 			{:else}
 				<!-- SEO -->
-				<section class="flex flex-col gap-3 rounded-xl border border-border bg-card p-6">
+				<section class="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
 					<div class="flex items-center gap-3">
 						<h2 class="min-w-0 flex-1 text-base font-semibold text-foreground">SEO</h2>
 						<StatusBadge collection="site_status" status={seoHealth} />
@@ -210,7 +210,7 @@
 				</section>
 
 				<!-- Google Business-profil -->
-				<section class="flex flex-col gap-3 rounded-xl border border-border bg-card p-6">
+				<section class="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
 					<div class="flex items-center gap-3">
 						<h2 class="min-w-0 flex-1 text-base font-semibold text-foreground">
 							Google Business-profil
@@ -241,7 +241,7 @@
 				</section>
 
 				<!-- Drift og sikkerhet -->
-				<section class="flex flex-col gap-3 rounded-xl border border-border bg-card p-6">
+				<section class="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
 					<h2 class="text-base font-semibold text-foreground">Drift og sikkerhet</h2>
 					{#if siteStatus}
 						<div class="flex flex-col">

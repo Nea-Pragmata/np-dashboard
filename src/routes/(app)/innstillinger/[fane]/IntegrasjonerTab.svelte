@@ -68,7 +68,7 @@
 	<div class="grid gap-4 sm:grid-cols-2">
 		{#each cards as card (card.provider)}
 			{@const Icon = card.icon}
-			<section class="flex flex-col gap-3 rounded-xl border border-border bg-card p-5">
+			<section class="flex flex-col gap-3 rounded-lg border border-border bg-card p-5">
 				<div class="flex items-center gap-3">
 					<span
 						class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground"

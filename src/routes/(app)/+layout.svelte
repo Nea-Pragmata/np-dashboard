@@ -3,12 +3,16 @@
 	import PanelLeft from '@lucide/svelte/icons/panel-left';
 	import Shield from '@lucide/svelte/icons/shield';
 	import LogOut from '@lucide/svelte/icons/log-out';
+	import Bell from '@lucide/svelte/icons/bell';
+	import Menu from '@lucide/svelte/icons/menu';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import AppShell from '$lib/components/layout/AppShell.svelte';
 	import NavItem from '$lib/components/layout/NavItem.svelte';
 	import TenantSwitcher from '$lib/components/layout/TenantSwitcher.svelte';
 	import Topbar from '$lib/components/layout/Topbar.svelte';
+	import MobileTabBar from '$lib/components/layout/MobileTabBar.svelte';
+	import MobileMenu from '$lib/components/layout/MobileMenu.svelte';
 	import { auth } from '$lib/stores/auth.svelte';
 	import { pb } from '$lib/pb';
 	import { filterNav, NAV_GROUPS } from '$lib/utils/modules';
@@ -17,6 +21,9 @@
 	import type { LayoutData } from './$types';
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
+
+	// Mobile off-canvas menu (opened by the topbar hamburger + the «Meny» tab).
+	let menuOpen = $state(false);
 
 	// Menu, arranged per Figma: «Oversikt» pinned on top, DRIFT/VEKST/NETTSTED
 	// groups in the middle, «Innstillinger» pinned to the footer.
@@ -178,6 +185,62 @@
 	<Topbar title={pageTitle} />
 {/snippet}
 
-<AppShell {sidebar} {topbar}>
+{#snippet mobileHeader()}
+	<!-- Mobil-topplinje (Figma 285:5494) + hamburger som åpner menyen. -->
+	<header class="flex h-14 shrink-0 items-center gap-3 border-b border-border bg-card px-4">
+		<span
+			class="flex size-6 shrink-0 items-center justify-center rounded-md bg-primary text-xs font-semibold text-primary-foreground"
+		>
+			N
+		</span>
+		<span class="min-w-0 flex-1">
+			<span class="block truncate text-sm font-medium text-foreground">{data.business?.name ?? ''}</span>
+			<span class="block truncate text-xs text-muted-foreground">
+				{data.business ? businessTypeLabel(data.business.type) : ''}
+			</span>
+		</span>
+		<button
+			type="button"
+			aria-label="Varsler"
+			class="relative flex size-9 shrink-0 items-center justify-center rounded-md text-text-body outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
+		>
+			<Bell class="size-[18px]" />
+			<span class="absolute right-2 top-2 size-1.5 rounded-full bg-accent-blue"></span>
+		</button>
+		<button
+			type="button"
+			aria-label="Åpne meny"
+			onclick={() => (menuOpen = true)}
+			class="flex size-9 shrink-0 items-center justify-center rounded-md text-text-body outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
+		>
+			<Menu class="size-[20px]" />
+		</button>
+	</header>
+{/snippet}
+
+{#snippet tabbar()}
+	<MobileTabBar
+		modules={data.modules}
+		inquiryBadge={inquiryBadge}
+		onMenuClick={() => (menuOpen = true)}
+	/>
+{/snippet}
+
+<AppShell {sidebar} {topbar} {mobileHeader} {tabbar}>
 	{@render children()}
 </AppShell>
+
+<MobileMenu
+	bind:open={menuOpen}
+	businessName={data.business?.name ?? ''}
+	businessType={data.business ? businessTypeLabel(data.business.type) : ''}
+	businessInitials={initials(data.business?.name ?? '')}
+	{groups}
+	{settings}
+	isAgency={auth.isAgency}
+	{inquiryBadge}
+	userName={auth.user?.name ?? ''}
+	{userRole}
+	{userInitials}
+	onLogout={logout}
+/>

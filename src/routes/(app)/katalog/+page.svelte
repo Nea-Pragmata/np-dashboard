@@ -19,6 +19,7 @@
 	import ConfirmDialog from '$lib/components/shared/ConfirmDialog.svelte';
 	import ProductDrawer from './ProductDrawer.svelte';
 	import CategoryDrawer from './CategoryDrawer.svelte';
+	import Fab from '$lib/components/layout/Fab.svelte';
 	import { formatCatalogPrice, slugify } from '$lib/utils/format';
 	import { pbError } from '$lib/utils/errors';
 	import { pb } from '$lib/pb';
@@ -210,12 +211,20 @@
 			</p>
 		</div>
 		{#if activeTab === 'produkter'}
-			<Button variant={products.length > 0 ? 'default' : 'outline'} onclick={openNewProduct}>
+			<Button
+				variant={products.length > 0 ? 'default' : 'outline'}
+				onclick={openNewProduct}
+				class="hidden md:inline-flex"
+			>
 				<Plus class="size-4" />
 				Nytt produkt
 			</Button>
 		{:else}
-			<Button variant={categories.length > 0 ? 'default' : 'outline'} onclick={openNewCategory}>
+			<Button
+				variant={categories.length > 0 ? 'default' : 'outline'}
+				onclick={openNewCategory}
+				class="hidden md:inline-flex"
+			>
 				<Plus class="size-4" />
 				Ny kategori
 			</Button>
@@ -343,7 +352,7 @@
 		</DataTable>
 	{:else}
 		<!-- Kategoriliste -->
-		<div class="overflow-hidden rounded-xl border border-border bg-card">
+		<div class="overflow-hidden rounded-lg border border-border bg-card">
 			{#if categories.length === 0}
 				<EmptyState
 					icon={FolderOpen}
@@ -446,3 +455,10 @@
 	destructive
 	onconfirm={confirmDeleteCategory}
 />
+
+<!-- Mobil primærhandling — følger aktiv fane (header-knappen skjules på mobil). -->
+{#if activeTab === 'produkter'}
+	<Fab onclick={openNewProduct} label="Nytt produkt" />
+{:else}
+	<Fab onclick={openNewCategory} label="Ny kategori" />
+{/if}

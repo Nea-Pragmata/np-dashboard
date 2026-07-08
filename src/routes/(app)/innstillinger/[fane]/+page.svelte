@@ -71,7 +71,7 @@
 
 	<!-- Aktiv fane -->
 	{#if loading}
-		<div class="h-64 animate-pulse rounded-xl border border-border bg-card"></div>
+		<div class="h-64 animate-pulse rounded-lg border border-border bg-card"></div>
 	{:else if fane === 'bedriftsprofil'}
 		<BedriftsprofilTab business={data.business} onsaved={refresh} />
 	{:else if fane === 'domene-epost'}

@@ -52,6 +52,18 @@ export const load: PageLoad = async ({ parent, fetch, url, depends }) => {
 	const monday = weekStart(parseIsoDate(url.searchParams.get('uke')) ?? new Date());
 	const nextMonday = addDays(monday, 7);
 	const weekStartIso = isoDate(monday);
+	const sundayIso = isoDate(addDays(monday, 6));
+
+	// Selected day for the mobile agenda view: `?dag=YYYY-MM-DD` when it falls in
+	// the visible week, otherwise today (if in the week), otherwise the Monday.
+	const todayIso = isoDate(new Date());
+	const dagIso = (() => {
+		const parsed = parseIsoDate(url.searchParams.get('dag'));
+		const iso = parsed ? isoDate(parsed) : null;
+		if (iso && iso >= weekStartIso && iso <= sundayIso) return iso;
+		if (todayIso >= weekStartIso && todayIso <= sundayIso) return todayIso;
+		return weekStartIso;
+	})();
 
 	// Half-open [monday, nextMonday) window on `start`, in UTC wall-clock.
 	const weekFilter =
@@ -91,7 +103,7 @@ export const load: PageLoad = async ({ parent, fetch, url, depends }) => {
 			})
 		]);
 
-		return { bookings, resources, products, staff, customers, weekStartIso };
+		return { bookings, resources, products, staff, customers, weekStartIso, selectedDayIso: dagIso };
 	} catch (e) {
 		if (isNetworkError(e)) error(503, NETWORK_MESSAGE);
 		throw e;

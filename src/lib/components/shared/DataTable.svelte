@@ -63,7 +63,7 @@
 	const skeletonColList = $derived(Array.from({ length: columns }, (_, i) => i));
 </script>
 
-<div class={cn('overflow-hidden rounded-xl border border-border bg-card', className)}>
+<div class={cn('overflow-hidden rounded-lg border border-border bg-card', className)}>
 	{#if state.status === 'loading'}
 		<table class="w-full border-collapse">
 			<thead>

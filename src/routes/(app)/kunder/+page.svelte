@@ -17,6 +17,7 @@
 	import EmptyState from '$lib/components/shared/EmptyState.svelte';
 	import ConfirmDialog from '$lib/components/shared/ConfirmDialog.svelte';
 	import CustomerDrawer from './CustomerDrawer.svelte';
+	import Fab from '$lib/components/layout/Fab.svelte';
 	import { formatDate, formatNumber, initials } from '$lib/utils/format';
 	import { pbError } from '$lib/utils/errors';
 	import { pb } from '$lib/pb';
@@ -154,7 +155,11 @@
 				Kundene dine — med samtykker og klippekort.
 			</p>
 		</div>
-		<Button variant={customers.length > 0 ? 'default' : 'outline'} onclick={openNew}>
+		<Button
+			variant={customers.length > 0 ? 'default' : 'outline'}
+			onclick={openNew}
+			class="hidden md:inline-flex"
+		>
 			<Plus class="size-4" />
 			Ny kunde
 		</Button>
@@ -314,3 +319,6 @@
 	destructive
 	onconfirm={confirmDelete}
 />
+
+<!-- Mobil primærhandling: «Ny kunde» (header-knappen skjules på mobil). -->
+<Fab onclick={openNew} label="Ny kunde" />

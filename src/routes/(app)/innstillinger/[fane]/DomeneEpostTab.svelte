@@ -18,7 +18,7 @@
 		toast.info('Ta kontakt med NP, så hjelper vi deg med domene og e-post.');
 	}
 
-	const cardClass = 'flex flex-col gap-4 rounded-xl border border-border bg-card p-6';
+	const cardClass = 'flex flex-col gap-4 rounded-lg border border-border bg-card p-6';
 	const cardTitle = 'text-base font-semibold text-foreground';
 	const rowLabel = 'text-sm text-text-body';
 	const npChip =

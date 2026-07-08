@@ -91,3 +91,35 @@ export function filterNav(modules: BusinessModules | null | undefined): NavItem[
 		return Boolean(modules?.[item.key]);
 	});
 }
+
+/**
+ * Priority order for the mobile bottom tab bar's middle slots. Booking and
+ * Henvendelser lead (matching Figma 285:5493); the rest fill in for tenants that
+ * lack them so the bar always surfaces the tenant's most useful primary modules.
+ */
+const MOBILE_TAB_ORDER: readonly ModuleKey[] = [
+	'booking',
+	'inquiries',
+	'catalog',
+	'customers',
+	'campaigns',
+	'reviews'
+];
+
+/**
+ * The middle tabs for the mobile bottom bar — up to two enabled primary modules
+ * in {@link MOBILE_TAB_ORDER}. «Oversikt» and «Meny» are structural (added by the
+ * tab bar itself) and are not returned here. A pure-website tenant (no operational
+ * module) falls back to «Nettsted & SEO» so the bar is never just Oversikt/Meny.
+ */
+export function mobilePrimaryNav(modules: BusinessModules | null | undefined): NavItem[] {
+	const middle = MOBILE_TAB_ORDER.filter((key) => Boolean(modules?.[key]))
+		.map((key) => NAV.find((item) => item.key === key))
+		.filter((item): item is NavItem => item !== undefined)
+		.slice(0, 2);
+	if (middle.length === 0) {
+		const nettsted = NAV.find((item) => item.href === '/nettsted');
+		return nettsted ? [nettsted] : [];
+	}
+	return middle;
+}
