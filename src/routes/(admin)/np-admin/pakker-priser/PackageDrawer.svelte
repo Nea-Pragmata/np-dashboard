@@ -31,9 +31,18 @@
 	let name = $state('');
 	let pricePerMonth = $state<number>(0);
 	let description = $state('');
+	let highlights = $state('');
 	let modules = $state<Record<string, boolean>>({});
 	let published = $state(false);
 	let saving = $state(false);
+
+	// `highlights` is a json string[] on the record; edited as one bullet per line.
+	const highlightList = $derived(
+		highlights
+			.split('\n')
+			.map((s) => s.trim())
+			.filter(Boolean)
+	);
 
 	let lastKey = '';
 	$effect(() => {
@@ -49,6 +58,7 @@
 		pricePerMonth = pkg?.price_per_month ?? 0;
 		// `description` is an editor (HTML) field; strip tags for the plain-text box.
 		description = (pkg?.description ?? '').replace(/<[^>]*>/g, '').trim();
+		highlights = (pkg?.highlights ?? []).join('\n');
 		const src = new Set<string>(pkg?.default_modules ?? []);
 		const next: Record<string, boolean> = {};
 		for (const { key: k } of MODULE_META) next[k] = src.has(k);
@@ -69,6 +79,7 @@
 					price_per_month: pricePerMonth,
 					description: description.trim(),
 					default_modules: selectedModules,
+					highlights: highlightList,
 					published
 				});
 				toast.success('Pakken er oppdatert.');
@@ -79,7 +90,7 @@
 					price_per_month: pricePerMonth,
 					description: description.trim(),
 					default_modules: selectedModules,
-					highlights: [],
+					highlights: highlightList,
 					published
 				});
 				toast.success('Pakken er opprettet.');
@@ -131,6 +142,20 @@
 		<div class="flex flex-col gap-1.5">
 			<Label for="pkg-desc">Beskrivelse</Label>
 			<Textarea id="pkg-desc" bind:value={description} rows={3} placeholder="Kort beskrivelse av pakken …" />
+		</div>
+
+		<!-- Highlights -->
+		<div class="flex flex-col gap-1.5">
+			<Label for="pkg-highlights">Highlights</Label>
+			<Textarea
+				id="pkg-highlights"
+				bind:value={highlights}
+				rows={5}
+				placeholder={'Ett punkt per linje, f.eks.\nEgen nettside\nTimebestilling\nStatistikk'}
+			/>
+			<p class="text-sm text-muted-foreground">
+				Punktene som vises på pakkekortet på nettsiden. Ett punkt per linje.
+			</p>
 		</div>
 
 		<!-- Standardmoduler -->

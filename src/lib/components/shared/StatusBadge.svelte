@@ -85,6 +85,12 @@
 			open: { label: 'Åpen', tone: 'warning' },
 			done: { label: 'Fullført', tone: 'success' }
 		},
+		agency_leads: {
+			new: { label: 'Ny', tone: 'info' },
+			in_dialog: { label: 'I dialog', tone: 'warning' },
+			won: { label: 'Vunnet', tone: 'success' },
+			lost: { label: 'Tapt', tone: 'neutral' }
+		},
 		waitlist_entries: {
 			waiting: { label: 'Venter', tone: 'warning' },
 			notified: { label: 'Varslet', tone: 'info' },

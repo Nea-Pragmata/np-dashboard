@@ -328,11 +328,13 @@ Indexes: (valid_from, valid_to); (published).
 - addons relation→addon_services MULTI opt
 - campaign relation→agency_campaigns opt
 - price_override number opt
+- billing_interval select(month, year) opt — added 2026-07-08; empty = month (UI default)
+- setup_fee number opt — added 2026-07-08; one-time startup charge, 0/empty = none
 - start_date date REQ
 - status select(active, paused, ended) REQ
 - invoice_note text opt
 
-Indexes: UNIQUE(business); (status). No invoice lines — monthly price computed in UI (package + addons − discount).
+Indexes: UNIQUE(business); (status). No invoice lines — recurring price computed in UI: `computeRecurring` = (package + monthly addons − discount) × (year ? 12 : 1), or `price_override` if set. One-time «oppstart» = `setup_fee` + one-time addons (`computeOneTime`).
 
 ### 1.29 agency_tasks (base)
 - business relation→businesses opt — empty = general agency task
@@ -362,6 +364,18 @@ Indexes: (status, interval).
 
 Indexes: (job, ran_at); (business, ran_at).
 
+### 1.32 agency_leads (base) — inbound leads from the AGENCY's own website (added 2026-07-08)
+Agency-global (no `business` field), mirrors the public-create pattern of `inquiries`/`bookings`.
+- name text REQ
+- email email REQ
+- phone text opt
+- company text opt
+- message text opt
+- source select(website, referral, other) REQ
+- status select(new, in_dialog, won, lost) REQ
+
+Rules: List/View/Update = BM (any active agency member); Create = PUBLIC guarded `@request.body.status = "new"` (website posts anonymously, cannot inject a non-new status; no relations so no `:isset` guard needed); Delete = BE. No indexes (small table, sorted `-created` in UI). Adversarially security-reviewed (public create endpoint).
+
 ## 2. Canonical rule expressions (paste verbatim, aliases MANDATORY)
 
 ```
@@ -388,7 +402,7 @@ For `businesses` itself, replace `business` with `id` in BYRÅ(...) (the record 
 Critical guards:
 - Every customer-facing Update branch MUST include `@request.body.business:isset = false` (anti cross-tenant move).
 - Create and Update rules are never shared where Create must send `business`.
-- Public Create endpoints (bookings, inquiries, waitlist_entries, link_events) have strict field validation and NO read access.
+- Public Create endpoints (bookings, inquiries, waitlist_entries, link_events, agency_leads) have strict field validation and NO read access.
 
 ## 3. Rules matrix (List/View/Create/Update/Delete)
 
@@ -427,6 +441,7 @@ Legend: EB = EGEN BEDRIFT, EE = EGEN EIER, BM = BYRÅMEDLEM, BY = BYRÅ(business
 | subscriptions | `business = @request.auth.business` OR BY | same | BE | BE | BE |
 | ai_jobs | BM | BM | BM | BM | BE |
 | ai_job_runs | BY OR customer branch² | same | null | null | null |
+| agency_leads | BM | BM | `@request.body.status = "new"` (public) | BM | BE |
 
 ¹ agency_tasks (all ops): `@collection.agency_members:am.user ?= @request.auth.id && @collection.agency_members:am.status ?= "active" && (business = "" || @collection.agency_members:am.allowed_businesses:length ?= 0 || @collection.agency_members:am.allowed_businesses.id ?= business)` (`:length ?= 0` per phase F correction)
 

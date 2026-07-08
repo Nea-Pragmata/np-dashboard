@@ -14,6 +14,7 @@ export const Collections = {
 	AddonServices: "addon_services",
 	AdminBusinessOverview: "admin_business_overview",
 	AgencyCampaigns: "agency_campaigns",
+	AgencyLeads: "agency_leads",
 	AgencyMembers: "agency_members",
 	AgencyTasks: "agency_tasks",
 	AiJobRuns: "ai_job_runs",
@@ -36,11 +37,13 @@ export const Collections = {
 	Packages: "packages",
 	Pages: "pages",
 	Products: "products",
+	PublicBookedSlots: "public_booked_slots",
 	PublicBookingConfig: "public_booking_config",
 	PublicBusinessProfiles: "public_business_profiles",
 	ReportSettings: "report_settings",
 	Resources: "resources",
 	Reviews: "reviews",
+	SiteEvents: "site_events",
 	SiteStatus: "site_status",
 	SocialPosts: "social_posts",
 	StatsOverview: "stats_overview",
@@ -186,6 +189,33 @@ export type AgencyCampaignsRecord = {
 	updated: IsoAutoDateString
 	valid_from: IsoDateString
 	valid_to: IsoDateString
+}
+
+export const AgencyLeadsSourceOptions = {
+	"website": "website",
+	"referral": "referral",
+	"other": "other",
+} as const
+export type AgencyLeadsSourceOptions = typeof AgencyLeadsSourceOptions[keyof typeof AgencyLeadsSourceOptions]
+
+export const AgencyLeadsStatusOptions = {
+	"new": "new",
+	"in_dialog": "in_dialog",
+	"won": "won",
+	"lost": "lost",
+} as const
+export type AgencyLeadsStatusOptions = typeof AgencyLeadsStatusOptions[keyof typeof AgencyLeadsStatusOptions]
+export type AgencyLeadsRecord = {
+	company?: string
+	created: IsoAutoDateString
+	email: string
+	id: string
+	message?: string
+	name: string
+	phone?: string
+	source: AgencyLeadsSourceOptions
+	status: AgencyLeadsStatusOptions
+	updated: IsoAutoDateString
 }
 
 export const AgencyMembersRoleOptions = {
@@ -678,6 +708,14 @@ export type ProductsRecord<Tattributes = unknown> = {
 	updated: IsoAutoDateString
 }
 
+export type PublicBookedSlotsRecord = {
+	business: RecordIdString
+	end: IsoDateString
+	id: string
+	product: RecordIdString
+	start: IsoDateString
+}
+
 export type PublicBookingConfigRecord<Tcancellation_deadline_hours = unknown, Tdeposit_enabled = unknown, Tdeposit_percent = unknown, Twaitlist_enabled = unknown> = {
 	business: RecordIdString
 	cancellation_deadline_hours?: null | Tcancellation_deadline_hours
@@ -751,6 +789,26 @@ export type ReviewsRecord = {
 	updated: IsoAutoDateString
 }
 
+export const SiteEventsTypeOptions = {
+	"page_view": "page_view",
+	"ring": "ring",
+	"veibeskrivelse": "veibeskrivelse",
+	"bestill-time": "bestill-time",
+	"skjema-sendt": "skjema-sendt",
+} as const
+export type SiteEventsTypeOptions = typeof SiteEventsTypeOptions[keyof typeof SiteEventsTypeOptions]
+export type SiteEventsRecord = {
+	business: RecordIdString
+	country?: string
+	created: IsoAutoDateString
+	id: string
+	is_unique?: boolean
+	path?: string
+	referrer?: string
+	type: SiteEventsTypeOptions
+	updated: IsoAutoDateString
+}
+
 export const SiteStatusSslStatusOptions = {
 	"ok": "ok",
 	"warning": "warning",
@@ -808,8 +866,15 @@ export const SubscriptionsStatusOptions = {
 	"ended": "ended",
 } as const
 export type SubscriptionsStatusOptions = typeof SubscriptionsStatusOptions[keyof typeof SubscriptionsStatusOptions]
+
+export const SubscriptionsBillingIntervalOptions = {
+	"month": "month",
+	"year": "year",
+} as const
+export type SubscriptionsBillingIntervalOptions = typeof SubscriptionsBillingIntervalOptions[keyof typeof SubscriptionsBillingIntervalOptions]
 export type SubscriptionsRecord = {
 	addons?: RecordIdString[]
+	billing_interval?: SubscriptionsBillingIntervalOptions
 	business: RecordIdString
 	campaign?: RecordIdString
 	created: IsoAutoDateString
@@ -817,6 +882,7 @@ export type SubscriptionsRecord = {
 	invoice_note?: string
 	package: RecordIdString
 	price_override?: number
+	setup_fee?: number
 	start_date: IsoDateString
 	status: SubscriptionsStatusOptions
 	updated: IsoAutoDateString
@@ -877,6 +943,7 @@ export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> &
 export type AddonServicesResponse<Texpand = unknown> = Required<AddonServicesRecord> & BaseSystemFields<Texpand>
 export type AdminBusinessOverviewResponse<Tmodule_count = unknown, Texpand = unknown> = Required<AdminBusinessOverviewRecord<Tmodule_count>> & BaseSystemFields<Texpand>
 export type AgencyCampaignsResponse<Texpand = unknown> = Required<AgencyCampaignsRecord> & BaseSystemFields<Texpand>
+export type AgencyLeadsResponse<Texpand = unknown> = Required<AgencyLeadsRecord> & BaseSystemFields<Texpand>
 export type AgencyMembersResponse<Texpand = unknown> = Required<AgencyMembersRecord> & BaseSystemFields<Texpand>
 export type AgencyTasksResponse<Texpand = unknown> = Required<AgencyTasksRecord> & BaseSystemFields<Texpand>
 export type AiJobRunsResponse<Tfindings = unknown, Texpand = unknown> = Required<AiJobRunsRecord<Tfindings>> & BaseSystemFields<Texpand>
@@ -899,11 +966,13 @@ export type LinksResponse<Texpand = unknown> = Required<LinksRecord> & BaseSyste
 export type PackagesResponse<Tdefault_modules = unknown, Thighlights = unknown, Texpand = unknown> = Required<PackagesRecord<Tdefault_modules, Thighlights>> & BaseSystemFields<Texpand>
 export type PagesResponse<Texpand = unknown> = Required<PagesRecord> & BaseSystemFields<Texpand>
 export type ProductsResponse<Tattributes = unknown, Texpand = unknown> = Required<ProductsRecord<Tattributes>> & BaseSystemFields<Texpand>
+export type PublicBookedSlotsResponse<Texpand = unknown> = Required<PublicBookedSlotsRecord> & BaseSystemFields<Texpand>
 export type PublicBookingConfigResponse<Tcancellation_deadline_hours = unknown, Tdeposit_enabled = unknown, Tdeposit_percent = unknown, Twaitlist_enabled = unknown, Texpand = unknown> = Required<PublicBookingConfigRecord<Tcancellation_deadline_hours, Tdeposit_enabled, Tdeposit_percent, Twaitlist_enabled>> & BaseSystemFields<Texpand>
 export type PublicBusinessProfilesResponse<Topening_hours = unknown, Texpand = unknown> = Required<PublicBusinessProfilesRecord<Topening_hours>> & BaseSystemFields<Texpand>
 export type ReportSettingsResponse<Texpand = unknown> = Required<ReportSettingsRecord> & BaseSystemFields<Texpand>
 export type ResourcesResponse<Texpand = unknown> = Required<ResourcesRecord> & BaseSystemFields<Texpand>
 export type ReviewsResponse<Texpand = unknown> = Required<ReviewsRecord> & BaseSystemFields<Texpand>
+export type SiteEventsResponse<Texpand = unknown> = Required<SiteEventsRecord> & BaseSystemFields<Texpand>
 export type SiteStatusResponse<Texpand = unknown> = Required<SiteStatusRecord> & BaseSystemFields<Texpand>
 export type SocialPostsResponse<Texpand = unknown> = Required<SocialPostsRecord> & BaseSystemFields<Texpand>
 export type StatsOverviewResponse<Tbookings_30d = unknown, Tclicks_30d = unknown, Tnew_inquiries = unknown, Tvisits_30d = unknown, Texpand = unknown> = Required<StatsOverviewRecord<Tbookings_30d, Tclicks_30d, Tnew_inquiries, Tvisits_30d>> & BaseSystemFields<Texpand>
@@ -922,6 +991,7 @@ export type CollectionRecords = {
 	addon_services: AddonServicesRecord
 	admin_business_overview: AdminBusinessOverviewRecord
 	agency_campaigns: AgencyCampaignsRecord
+	agency_leads: AgencyLeadsRecord
 	agency_members: AgencyMembersRecord
 	agency_tasks: AgencyTasksRecord
 	ai_job_runs: AiJobRunsRecord
@@ -944,11 +1014,13 @@ export type CollectionRecords = {
 	packages: PackagesRecord
 	pages: PagesRecord
 	products: ProductsRecord
+	public_booked_slots: PublicBookedSlotsRecord
 	public_booking_config: PublicBookingConfigRecord
 	public_business_profiles: PublicBusinessProfilesRecord
 	report_settings: ReportSettingsRecord
 	resources: ResourcesRecord
 	reviews: ReviewsRecord
+	site_events: SiteEventsRecord
 	site_status: SiteStatusRecord
 	social_posts: SocialPostsRecord
 	stats_overview: StatsOverviewRecord
@@ -966,6 +1038,7 @@ export type CollectionResponses = {
 	addon_services: AddonServicesResponse
 	admin_business_overview: AdminBusinessOverviewResponse
 	agency_campaigns: AgencyCampaignsResponse
+	agency_leads: AgencyLeadsResponse
 	agency_members: AgencyMembersResponse
 	agency_tasks: AgencyTasksResponse
 	ai_job_runs: AiJobRunsResponse
@@ -988,11 +1061,13 @@ export type CollectionResponses = {
 	packages: PackagesResponse
 	pages: PagesResponse
 	products: ProductsResponse
+	public_booked_slots: PublicBookedSlotsResponse
 	public_booking_config: PublicBookingConfigResponse
 	public_business_profiles: PublicBusinessProfilesResponse
 	report_settings: ReportSettingsResponse
 	resources: ResourcesResponse
 	reviews: ReviewsResponse
+	site_events: SiteEventsResponse
 	site_status: SiteStatusResponse
 	social_posts: SocialPostsResponse
 	stats_overview: StatsOverviewResponse

@@ -13,6 +13,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import Users from '@lucide/svelte/icons/users';
+	import Inbox from '@lucide/svelte/icons/inbox';
 	import Plus from '@lucide/svelte/icons/plus';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import CreditCard from '@lucide/svelte/icons/credit-card';
@@ -38,6 +39,7 @@
 	// land in the next NP Admin milestone.
 	const NAV: readonly AdminNavItem[] = [
 		{ label: 'Bedrifter', href: '/np-admin/bedrifter', icon: Users },
+		{ label: 'Leads', href: '/np-admin/leads', icon: Inbox },
 		{ label: 'Onboarding', href: '/np-admin/onboarding', icon: Plus },
 		{ label: 'Maler', href: '/np-admin/maler', icon: FileText },
 		{ label: 'Pakker & priser', href: '/np-admin/pakker-priser', icon: CreditCard },

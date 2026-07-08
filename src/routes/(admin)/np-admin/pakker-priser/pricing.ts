@@ -8,7 +8,8 @@ import { formatKr, formatNumber } from '$lib/utils/format';
 import { MODULE_KEYS, type ModuleKey } from '$lib/utils/modules';
 import {
 	AddonServicesPriceTypeOptions,
-	AgencyCampaignsDiscountTypeOptions
+	AgencyCampaignsDiscountTypeOptions,
+	SubscriptionsBillingIntervalOptions
 } from '$lib/pocketbase-types';
 import type { StatusTone } from '$lib/components/shared/StatusBadge.svelte';
 
@@ -117,6 +118,41 @@ export const TONE_BADGE: Record<StatusTone, string> = {
 	info: 'bg-accent-blue-bg text-accent-blue-text',
 	neutral: 'bg-muted text-muted-foreground'
 };
+
+/** Billing-interval choices for the subscription drawer select. */
+export const INTERVAL_OPTIONS = [
+	{ value: SubscriptionsBillingIntervalOptions.month, label: 'Per måned' },
+	{ value: SubscriptionsBillingIntervalOptions.year, label: 'Per år' }
+] as const;
+
+/** «/md» or «/år» suffix for a `subscriptions.billing_interval` value (missing → monthly). */
+export function intervalSuffix(interval?: string): string {
+	return interval === SubscriptionsBillingIntervalOptions.year ? '/år' : '/md';
+}
+
+/**
+ * Recurring price for the chosen billing interval. `monthlyBase` is the pure
+ * per-month figure (see `computeMonthly` with no override). A positive
+ * `override` is the final agreed price for the interval and wins outright;
+ * otherwise a yearly interval is 12× the monthly base. Missing interval → monthly.
+ */
+export function computeRecurring(
+	monthlyBase: number | null,
+	interval?: string,
+	override?: number | null
+): number | null {
+	if (override != null && override > 0) return override;
+	if (monthlyBase == null) return null;
+	return interval === SubscriptionsBillingIntervalOptions.year ? monthlyBase * 12 : monthlyBase;
+}
+
+/** One-time startup total: the agency setup fee + any one-time add-ons. */
+export function computeOneTime(addons: PricedAddon[], setupFee?: number | null): number {
+	const oneTimeAddons = addons
+		.filter((a) => a.price_type === AddonServicesPriceTypeOptions.one_time)
+		.reduce((sum, a) => sum + (a.price ?? 0), 0);
+	return (setupFee && setupFee > 0 ? setupFee : 0) + oneTimeAddons;
+}
 
 /** A priced add-on, for the monthly-total computation. */
 export interface PricedAddon {

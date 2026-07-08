@@ -11,8 +11,19 @@
 	import { pb } from '$lib/pb';
 	import { pbError } from '$lib/utils/errors';
 	import { formatKr } from '$lib/utils/format';
-	import { Collections, SubscriptionsStatusOptions } from '$lib/pocketbase-types';
-	import { computeMonthly, type PricedAddon } from './pricing';
+	import {
+		Collections,
+		SubscriptionsStatusOptions,
+		SubscriptionsBillingIntervalOptions
+	} from '$lib/pocketbase-types';
+	import {
+		computeMonthly,
+		computeRecurring,
+		computeOneTime,
+		INTERVAL_OPTIONS,
+		intervalSuffix,
+		type PricedAddon
+	} from './pricing';
 	import type { SubRow, PackageRow, AddonRow, CampaignRow, BusinessRow } from './+page';
 
 	let {
@@ -48,6 +59,8 @@
 	let addonIds = $state<string[]>([]);
 	let campaignId = $state('');
 	let priceOverride = $state<number | null>(null);
+	let billingInterval = $state<string>(SubscriptionsBillingIntervalOptions.month);
+	let setupFee = $state<number | null>(null);
 	let startDate = $state('');
 	let status = $state<string>(SubscriptionsStatusOptions.active);
 	let invoiceNote = $state('');
@@ -75,6 +88,8 @@
 		addonIds = subscription ? [...(subscription.addons ?? [])] : [];
 		campaignId = subscription?.campaign ?? '';
 		priceOverride = subscription?.price_override ? subscription.price_override : null;
+		billingInterval = subscription?.billing_interval || SubscriptionsBillingIntervalOptions.month;
+		setupFee = subscription?.setup_fee ? subscription.setup_fee : null;
 		startDate = subscription ? toDateInput(subscription.start_date) : toDateInput(new Date().toISOString());
 		status = subscription?.status ?? SubscriptionsStatusOptions.active;
 		invoiceNote = subscription?.invoice_note ?? '';
@@ -102,6 +117,9 @@
 		campaignId ? (campaigns.find((c) => c.id === campaignId)?.name ?? 'Kampanje') : 'Ingen kampanje'
 	);
 	const statusLabel = $derived(STATUS_OPTIONS.find((s) => s.value === status)?.label ?? 'Aktivt');
+	const intervalLabel = $derived(
+		INTERVAL_OPTIONS.find((o) => o.value === billingInterval)?.label ?? 'Per måned'
+	);
 	const businessLabel = $derived(
 		businessId ? (availableBusinesses.find((b) => b.id === businessId)?.name ?? 'Velg bedrift') : 'Velg bedrift'
 	);
@@ -110,19 +128,22 @@
 		addonIds = on ? [...addonIds, id] : addonIds.filter((x) => x !== id);
 	}
 
-	// Live monthly-price preview (the computed effect the price book is about).
-	const monthlyPreview = $derived.by(() => {
+	// Live price preview: the recurring figure for the chosen interval, plus the
+	// one-time startup cost (setup fee + one-time add-ons), shown separately.
+	const chosenAddons = $derived<PricedAddon[]>(
+		addons.filter((a) => addonIds.includes(a.id)).map((a) => ({ price: a.price, price_type: a.price_type }))
+	);
+	const monthlyBase = $derived.by(() => {
 		const pkg = packages.find((p) => p.id === packageId);
 		const pkgPrice = pkg ? pkg.price_per_month : null;
-		const chosenAddons: PricedAddon[] = addons
-			.filter((a) => addonIds.includes(a.id))
-			.map((a) => ({ price: a.price, price_type: a.price_type }));
 		const camp = campaigns.find((c) => c.id === campaignId);
 		const discount = camp
 			? { discount_type: camp.discount_type, discount_value: camp.discount_value }
 			: null;
-		return computeMonthly(pkgPrice, chosenAddons, discount, priceOverride);
+		return computeMonthly(pkgPrice, chosenAddons, discount, null);
 	});
+	const recurringPreview = $derived(computeRecurring(monthlyBase, billingInterval, priceOverride));
+	const oneTimePreview = $derived(computeOneTime(chosenAddons, setupFee));
 
 	const canSave = $derived(!saving && Boolean(businessId && packageId && startDate));
 
@@ -135,6 +156,8 @@
 				addons: addonIds,
 				campaign: campaignId || null,
 				price_override: priceOverride && priceOverride > 0 ? priceOverride : null,
+				billing_interval: billingInterval,
+				setup_fee: setupFee && setupFee > 0 ? setupFee : null,
 				start_date: new Date(startDate).toISOString(),
 				status,
 				invoice_note: invoiceNote.trim()
@@ -239,16 +262,34 @@
 			</Select.Root>
 		</div>
 
-		<!-- Månedspris -->
-		<div class="flex flex-col gap-3 border-t border-border pt-5">
+		<!-- Pris -->
+		<div class="flex flex-col gap-4 border-t border-border pt-5">
 			<div class="flex items-baseline justify-between gap-2">
-				<p class={sectionLabel}>Månedspris</p>
+				<p class={sectionLabel}>Driftspris</p>
 				<span class="text-sm font-semibold tabular-nums text-foreground">
-					{monthlyPreview == null ? '—' : `${formatKr(monthlyPreview)}/md`}
+					{recurringPreview == null ? '—' : `${formatKr(recurringPreview)}${intervalSuffix(billingInterval)}`}
 				</span>
 			</div>
+
+			<!-- Faktureringsintervall -->
 			<div class="flex flex-col gap-1.5">
-				<Label for="sub-override">Overstyr månedspris (valgfritt)</Label>
+				<Label for="sub-interval">Faktureres</Label>
+				<Select.Root type="single" bind:value={billingInterval}>
+					<Select.Trigger id="sub-interval" class="w-full">{intervalLabel}</Select.Trigger>
+					<Select.Content>
+						{#each INTERVAL_OPTIONS as o (o.value)}
+							<Select.Item value={o.value} label={o.label}>{o.label}</Select.Item>
+						{/each}
+					</Select.Content>
+				</Select.Root>
+				<p class="text-sm text-muted-foreground">
+					Årspris beregnes som 12 × månedsprisen med mindre du overstyrer.
+				</p>
+			</div>
+
+			<!-- Overstyr driftspris -->
+			<div class="flex flex-col gap-1.5">
+				<Label for="sub-override">Overstyr driftspris (valgfritt)</Label>
 				<div class="relative">
 					<Input
 						id="sub-override"
@@ -265,6 +306,35 @@
 						kr
 					</span>
 				</div>
+			</div>
+
+			<!-- Oppstartspris (engangs) -->
+			<div class="flex flex-col gap-1.5">
+				<div class="flex items-baseline justify-between gap-2">
+					<Label for="sub-setup">Oppstartspris (engangs)</Label>
+					<span class="text-xs tabular-nums text-muted-foreground">
+						Oppstart totalt: {formatKr(oneTimePreview)}
+					</span>
+				</div>
+				<div class="relative">
+					<Input
+						id="sub-setup"
+						type="number"
+						min="0"
+						step="100"
+						placeholder="0"
+						bind:value={setupFee}
+						class="pr-10 tabular-nums"
+					/>
+					<span
+						class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground"
+					>
+						kr
+					</span>
+				</div>
+				<p class="text-sm text-muted-foreground">
+					Faktureres én gang ved oppstart. Engangs tilleggstjenester legges til i totalen.
+				</p>
 			</div>
 		</div>
 

@@ -31,6 +31,8 @@
 		campaignPeriodLabel,
 		campaignStatusMeta,
 		computeMonthly,
+		computeRecurring,
+		intervalSuffix,
 		TONE_BADGE,
 		type PricedAddon
 	} from './pricing';
@@ -71,7 +73,7 @@
 		return data.businesses.filter((b) => !taken.has(b.id));
 	});
 
-	function subMonthly(s: SubRow): number | null {
+	function subRecurring(s: SubRow): { amount: number | null; interval: string } {
 		const pkg = packagesById.get(s.package);
 		const pkgPrice = pkg ? pkg.price_per_month : null;
 		const chosen: PricedAddon[] = (s.addons ?? [])
@@ -82,7 +84,8 @@
 		const discount = camp
 			? { discount_type: camp.discount_type, discount_value: camp.discount_value }
 			: null;
-		return computeMonthly(pkgPrice, chosen, discount, s.price_override);
+		const monthlyBase = computeMonthly(pkgPrice, chosen, discount, null);
+		return { amount: computeRecurring(monthlyBase, s.billing_interval, s.price_override), interval: s.billing_interval };
 	}
 	function subPackageName(s: SubRow): string {
 		return s.expand?.package?.name ?? packagesById.get(s.package)?.name ?? 'Upublisert pakke';
@@ -409,16 +412,16 @@
 			{#snippet header()}
 				<th>Bedrift</th>
 				<th class="w-[200px]">Pakke</th>
-				<th class="w-[160px] text-right">Månedspris</th>
+				<th class="w-[160px] text-right">Driftspris</th>
 				<th class="w-[120px]">Status</th>
 				{#if showActions}<th class="w-[56px]"><span class="sr-only">Handlinger</span></th>{/if}
 			{/snippet}
 			{#snippet row(s)}
-				{@const monthly = subMonthly(s)}
+				{@const rec = subRecurring(s)}
 				<td class="text-sm font-medium text-foreground">{s.expand?.business?.name ?? 'Ukjent bedrift'}</td>
 				<td class="text-text-body">{subPackageName(s)}</td>
 				<td class="text-right tabular-nums text-text-body">
-					{monthly == null ? '—' : `${formatKr(monthly)}/md`}
+					{rec.amount == null ? '—' : `${formatKr(rec.amount)}${intervalSuffix(rec.interval)}`}
 				</td>
 				<td><StatusBadge collection="subscriptions" status={s.status} /></td>
 				{#if showActions}
