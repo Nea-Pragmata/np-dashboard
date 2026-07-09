@@ -20,6 +20,7 @@
 
 	const leads = $derived(data.leads);
 	const slots = $derived(data.slots);
+	const people = $derived(data.people);
 
 	// lead id → the slot that lead booked (for the drawer's «Booket prat»).
 	const bookedByLead = $derived.by(() => {
@@ -128,7 +129,7 @@
 	<!-- Leads-tabell -->
 	<DataTable
 		state={tableState}
-		columns={5}
+		columns={6}
 		onRetry={refresh}
 		empty={leads.length === 0
 			? {
@@ -144,10 +145,11 @@
 	>
 		{#snippet header()}
 			<th>Navn</th>
-			<th class="w-[220px]">Bedrift</th>
-			<th class="w-[220px]">E-post</th>
-			<th class="w-[130px]">Status</th>
-			<th class="w-[130px]">Mottatt</th>
+			<th class="w-[180px]">Bedrift</th>
+			<th class="w-[200px]">E-post</th>
+			<th class="w-[150px]">Ansvarlig</th>
+			<th class="w-[120px]">Status</th>
+			<th class="w-[120px]">Mottatt</th>
 		{/snippet}
 		{#snippet row(l)}
 			<td>
@@ -161,18 +163,20 @@
 			</td>
 			<td class="text-text-body">{l.company || '—'}</td>
 			<td class="truncate text-text-body">{l.email}</td>
+			<td class="text-text-body">{l.expand?.assigned_to?.name ?? '—'}</td>
 			<td><StatusBadge collection="agency_leads" status={l.status} /></td>
 			<td class="text-text-body">{formatDate(l.created)}</td>
 		{/snippet}
 	</DataTable>
 
 	<!-- Ledige prat-tider (felles pott → «Book en prat» på nettsiden) -->
-	<CallSlots {slots} onchanged={refresh} />
+	<CallSlots {slots} {leads} onchanged={refresh} />
 </div>
 
 <LeadDrawer
 	bind:open={drawerOpen}
 	lead={selectedLead}
 	bookedSlot={selectedLead ? (bookedByLead.get(selectedLead.id) ?? null) : null}
+	{people}
 	onsaved={refresh}
 />

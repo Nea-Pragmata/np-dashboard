@@ -221,6 +221,7 @@ export const AgencyLeadsStatusOptions = {
 } as const
 export type AgencyLeadsStatusOptions = typeof AgencyLeadsStatusOptions[keyof typeof AgencyLeadsStatusOptions]
 export type AgencyLeadsRecord = {
+	assigned_to?: RecordIdString
 	call_time?: string
 	company?: string
 	created: IsoAutoDateString
@@ -228,6 +229,7 @@ export type AgencyLeadsRecord = {
 	id: string
 	message?: string
 	name: string
+	note?: string
 	phone?: string
 	source: AgencyLeadsSourceOptions
 	status: AgencyLeadsStatusOptions

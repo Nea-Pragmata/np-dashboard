@@ -7,21 +7,33 @@
 	import { Input } from '$lib/components/ui/input';
 	import StatusBadge from '$lib/components/shared/StatusBadge.svelte';
 	import ConfirmDialog from '$lib/components/shared/ConfirmDialog.svelte';
+	import SlotDrawer from './SlotDrawer.svelte';
 	import { pb } from '$lib/pb';
 	import { pbError } from '$lib/utils/errors';
 	import { formatDateTime } from '$lib/utils/format';
 	import { Collections, AgencyCallSlotsStatusOptions } from '$lib/pocketbase-types';
-	import type { CallSlotRow } from './+page';
+	import type { CallSlotRow, LeadRow } from './+page';
 
 	let {
 		slots = [],
+		leads = [],
 		onchanged
 	}: {
 		/** All call slots (open + booked), sorted by `starts`. */
 		slots?: CallSlotRow[];
-		/** Called after a slot is added or removed so the parent can invalidate. */
+		/** Leads to pick from when marking a slot booked (passed to the editor). */
+		leads?: LeadRow[];
+		/** Called after a slot is added, edited or removed so the parent can invalidate. */
 		onchanged?: () => void;
 	} = $props();
+
+	// Edit drawer (change time / mark booked / link a lead).
+	let editOpen = $state(false);
+	let editingSlot = $state<CallSlotRow | null>(null);
+	function openEdit(slot: CallSlotRow) {
+		editingSlot = slot;
+		editOpen = true;
+	}
 
 	// datetime-local value, e.g. "2026-07-15T19:00". Empty = nothing to add.
 	let newSlot = $state('');
@@ -144,13 +156,20 @@
 		<ul class="flex flex-col divide-y divide-border rounded-lg border border-border">
 			{#each slots as slot (slot.id)}
 				<li class="flex items-center gap-3 px-3 py-2.5">
-					<Clock class="size-4 shrink-0 text-text-subtle" />
-					<span class="min-w-0 flex-1 text-sm tabular-nums text-foreground">
-						{formatDateTime(slot.starts)}
-						{#if slot.status === AgencyCallSlotsStatusOptions.booked}
-							<span class="text-muted-foreground"> · {leadName(slot)}</span>
-						{/if}
-					</span>
+					<button
+						type="button"
+						onclick={() => openEdit(slot)}
+						aria-label="Rediger prat-tid {formatDateTime(slot.starts)}"
+						class="-mx-1 flex min-w-0 flex-1 items-center gap-3 rounded-md px-1 py-0.5 text-left outline-none hover:text-accent-blue-text focus-visible:ring-2 focus-visible:ring-ring"
+					>
+						<Clock class="size-4 shrink-0 text-text-subtle" />
+						<span class="min-w-0 flex-1 text-sm tabular-nums text-foreground">
+							{formatDateTime(slot.starts)}
+							{#if slot.status === AgencyCallSlotsStatusOptions.booked}
+								<span class="text-muted-foreground"> · {leadName(slot)}</span>
+							{/if}
+						</span>
+					</button>
 					<StatusBadge collection="agency_call_slots" status={slot.status} />
 					<button
 						type="button"
@@ -180,3 +199,5 @@
 		pendingDelete = null;
 	}}
 />
+
+<SlotDrawer bind:open={editOpen} slot={editingSlot} {leads} onsaved={onchanged} />

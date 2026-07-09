@@ -372,10 +372,12 @@ Agency-global (no `business` field), mirrors the public-create pattern of `inqui
 - company text opt
 - message text opt
 - call_time text opt — added 2026-07-09; free-text «ønsket prat-tid» (e.g. "helst etter kl. 17"), public-settable on create
+- note text opt — added 2026-07-09; INTERNAL agency note, never public-settable
+- assigned_to relation→users opt — added 2026-07-09; the responsible agency person («Ansvarlig»)
 - source select(website, referral, other) REQ
 - status select(new, in_dialog, won, lost) REQ
 
-Rules: List/View/Update = BM (any active agency member); Create = PUBLIC guarded `@request.body.status = "new"` (website posts anonymously, cannot inject a non-new status; no relations so no `:isset` guard needed); Delete = BE. No indexes (small table, sorted `-created` in UI). Adversarially security-reviewed (public create endpoint).
+Rules: List/View/Update = BM (any active agency member — so a customer/non-agency user can't read or assign leads); Create = PUBLIC guarded `@request.body.status = "new" && @request.body.assigned_to:isset = false && @request.body.note:isset = false` (website posts anonymously with status=new and CANNOT pre-assign or write an internal note); Delete = BE. No indexes (small table, sorted `-created` in UI). Adversarially security-reviewed (public create endpoint + assign/edit surface).
 
 ### 1.33 agency_call_slots (base) — shared «Book en prat» availability pool (added 2026-07-09)
 Agency-global. The byrå enters open 20-min call slots; the public website's «Book en prat» card shows the open ones; a lead that books one links back via `lead`. Managed from NP Admin › Leads («Ledige prat-tider»).
@@ -450,7 +452,7 @@ Legend: EB = EGEN BEDRIFT, EE = EGEN EIER, BM = BYRÅMEDLEM, BY = BYRÅ(business
 | subscriptions | `business = @request.auth.business` OR BY | same | BE | BE | BE |
 | ai_jobs | BM | BM | BM | BM | BE |
 | ai_job_runs | BY OR customer branch² | same | null | null | null |
-| agency_leads | BM | BM | `@request.body.status = "new"` (public) | BM | BE |
+| agency_leads | BM | BM | `@request.body.status = "new" && @request.body.assigned_to:isset = false && @request.body.note:isset = false` (public) | BM | BE |
 | agency_call_slots | `status = "open"` OR BM | same | BM | BM | BM |
 
 ¹ agency_tasks (all ops): `@collection.agency_members:am.user ?= @request.auth.id && @collection.agency_members:am.status ?= "active" && (business = "" || @collection.agency_members:am.allowed_businesses:length ?= 0 || @collection.agency_members:am.allowed_businesses.id ?= business)` (`:length ?= 0` per phase F correction)
