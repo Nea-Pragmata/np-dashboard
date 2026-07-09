@@ -3,15 +3,21 @@
 	import { invalidateAll } from '$app/navigation';
 	import Search from '@lucide/svelte/icons/search';
 	import Inbox from '@lucide/svelte/icons/inbox';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import Check from '@lucide/svelte/icons/check';
+	import { toast } from 'svelte-sonner';
 	import { Input } from '$lib/components/ui/input';
 	import * as Select from '$lib/components/ui/select';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import DataTable from '$lib/components/shared/DataTable.svelte';
 	import KpiCard from '$lib/components/shared/KpiCard.svelte';
 	import StatusBadge from '$lib/components/shared/StatusBadge.svelte';
 	import LeadDrawer from './LeadDrawer.svelte';
 	import CallSlots from './CallSlots.svelte';
+	import { pb } from '$lib/pb';
+	import { pbError } from '$lib/utils/errors';
 	import { formatDate } from '$lib/utils/format';
-	import { AgencyLeadsStatusOptions, AgencyCallSlotsStatusOptions } from '$lib/pocketbase-types';
+	import { Collections, AgencyLeadsStatusOptions, AgencyCallSlotsStatusOptions } from '$lib/pocketbase-types';
 	import type { TableState } from '$lib/types';
 	import type { PageData } from './$types';
 	import type { LeadRow, CallSlotRow } from './+page';
@@ -71,6 +77,28 @@
 
 	function refresh() {
 		return invalidateAll();
+	}
+
+	// Quick status change straight from the list (no drawer needed).
+	const STATUSES = [
+		AgencyLeadsStatusOptions.new,
+		AgencyLeadsStatusOptions.in_dialog,
+		AgencyLeadsStatusOptions.won,
+		AgencyLeadsStatusOptions.lost
+	];
+	let changingId = $state('');
+	async function changeStatus(lead: LeadRow, status: string) {
+		if (lead.status === status || changingId) return;
+		changingId = lead.id;
+		try {
+			await pb.collection(Collections.AgencyLeads).update(lead.id, { status });
+			toast.success('Statusen er oppdatert.');
+			await invalidateAll();
+		} catch (e) {
+			toast.error(pbError(e) || 'Kunne ikke endre status.');
+		} finally {
+			changingId = '';
+		}
 	}
 
 	let drawerOpen = $state(false);
@@ -164,7 +192,26 @@
 			<td class="text-text-body">{l.company || '—'}</td>
 			<td class="truncate text-text-body">{l.email}</td>
 			<td class="text-text-body">{l.expand?.assigned_to?.name ?? '—'}</td>
-			<td><StatusBadge collection="agency_leads" status={l.status} /></td>
+			<td>
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger
+						disabled={changingId === l.id}
+						aria-label="Endre status for {l.name}"
+						class="group flex items-center gap-1 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+					>
+						<StatusBadge collection="agency_leads" status={l.status} />
+						<ChevronDown class="size-3.5 text-text-subtle transition-colors group-hover:text-foreground" />
+					</DropdownMenu.Trigger>
+					<DropdownMenu.Content align="start">
+						{#each STATUSES as s (s)}
+							<DropdownMenu.Item onSelect={() => changeStatus(l, s)} class="gap-2">
+								<Check class="size-4 {l.status === s ? 'opacity-100' : 'opacity-0'}" />
+								<StatusBadge collection="agency_leads" status={s} />
+							</DropdownMenu.Item>
+						{/each}
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
+			</td>
 			<td class="text-text-body">{formatDate(l.created)}</td>
 		{/snippet}
 	</DataTable>
