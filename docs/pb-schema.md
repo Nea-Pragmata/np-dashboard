@@ -371,10 +371,19 @@ Agency-global (no `business` field), mirrors the public-create pattern of `inqui
 - phone text opt
 - company text opt
 - message text opt
+- call_time text opt — added 2026-07-09; free-text «ønsket prat-tid» (e.g. "helst etter kl. 17"), public-settable on create
 - source select(website, referral, other) REQ
 - status select(new, in_dialog, won, lost) REQ
 
 Rules: List/View/Update = BM (any active agency member); Create = PUBLIC guarded `@request.body.status = "new"` (website posts anonymously, cannot inject a non-new status; no relations so no `:isset` guard needed); Delete = BE. No indexes (small table, sorted `-created` in UI). Adversarially security-reviewed (public create endpoint).
+
+### 1.33 agency_call_slots (base) — shared «Book en prat» availability pool (added 2026-07-09)
+Agency-global. The byrå enters open 20-min call slots; the public website's «Book en prat» card shows the open ones; a lead that books one links back via `lead`. Managed from NP Admin › Leads («Ledige prat-tider»).
+- starts date REQ — slot start (UTC; displayed Europe/Oslo)
+- status select(open, booked) REQ
+- lead relation→agency_leads opt — set when a lead books (booked slots only)
+
+Rules: List/View = `status = "open" || BM` (PUBLIC reads ONLY open slots — booked slots with a `lead` id are agency-only, no lead-enumeration leak); Create/Update/Delete = BM (agency manages availability). **Public booking (guest flipping a slot to booked) is NOT wired — a nettside follow-up; today the agency marks booked manually.** No indexes.
 
 ## 2. Canonical rule expressions (paste verbatim, aliases MANDATORY)
 
@@ -442,6 +451,7 @@ Legend: EB = EGEN BEDRIFT, EE = EGEN EIER, BM = BYRÅMEDLEM, BY = BYRÅ(business
 | ai_jobs | BM | BM | BM | BM | BE |
 | ai_job_runs | BY OR customer branch² | same | null | null | null |
 | agency_leads | BM | BM | `@request.body.status = "new"` (public) | BM | BE |
+| agency_call_slots | `status = "open"` OR BM | same | BM | BM | BM |
 
 ¹ agency_tasks (all ops): `@collection.agency_members:am.user ?= @request.auth.id && @collection.agency_members:am.status ?= "active" && (business = "" || @collection.agency_members:am.allowed_businesses:length ?= 0 || @collection.agency_members:am.allowed_businesses.id ?= business)` (`:length ?= 0` per phase F correction)
 

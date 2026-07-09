@@ -13,6 +13,7 @@ export const Collections = {
 	Superusers: "_superusers",
 	AddonServices: "addon_services",
 	AdminBusinessOverview: "admin_business_overview",
+	AgencyCallSlots: "agency_call_slots",
 	AgencyCampaigns: "agency_campaigns",
 	AgencyLeads: "agency_leads",
 	AgencyMembers: "agency_members",
@@ -172,6 +173,20 @@ export type AdminBusinessOverviewRecord<Tmodule_count = unknown> = {
 	type: AdminBusinessOverviewTypeOptions
 }
 
+export const AgencyCallSlotsStatusOptions = {
+	"open": "open",
+	"booked": "booked",
+} as const
+export type AgencyCallSlotsStatusOptions = typeof AgencyCallSlotsStatusOptions[keyof typeof AgencyCallSlotsStatusOptions]
+export type AgencyCallSlotsRecord = {
+	created: IsoAutoDateString
+	id: string
+	lead?: RecordIdString
+	starts: IsoDateString
+	status: AgencyCallSlotsStatusOptions
+	updated: IsoAutoDateString
+}
+
 export const AgencyCampaignsDiscountTypeOptions = {
 	"percent": "percent",
 	"amount": "amount",
@@ -206,6 +221,7 @@ export const AgencyLeadsStatusOptions = {
 } as const
 export type AgencyLeadsStatusOptions = typeof AgencyLeadsStatusOptions[keyof typeof AgencyLeadsStatusOptions]
 export type AgencyLeadsRecord = {
+	call_time?: string
 	company?: string
 	created: IsoAutoDateString
 	email: string
@@ -942,6 +958,7 @@ export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemF
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
 export type AddonServicesResponse<Texpand = unknown> = Required<AddonServicesRecord> & BaseSystemFields<Texpand>
 export type AdminBusinessOverviewResponse<Tmodule_count = unknown, Texpand = unknown> = Required<AdminBusinessOverviewRecord<Tmodule_count>> & BaseSystemFields<Texpand>
+export type AgencyCallSlotsResponse<Texpand = unknown> = Required<AgencyCallSlotsRecord> & BaseSystemFields<Texpand>
 export type AgencyCampaignsResponse<Texpand = unknown> = Required<AgencyCampaignsRecord> & BaseSystemFields<Texpand>
 export type AgencyLeadsResponse<Texpand = unknown> = Required<AgencyLeadsRecord> & BaseSystemFields<Texpand>
 export type AgencyMembersResponse<Texpand = unknown> = Required<AgencyMembersRecord> & BaseSystemFields<Texpand>
@@ -990,6 +1007,7 @@ export type CollectionRecords = {
 	_superusers: SuperusersRecord
 	addon_services: AddonServicesRecord
 	admin_business_overview: AdminBusinessOverviewRecord
+	agency_call_slots: AgencyCallSlotsRecord
 	agency_campaigns: AgencyCampaignsRecord
 	agency_leads: AgencyLeadsRecord
 	agency_members: AgencyMembersRecord
@@ -1037,6 +1055,7 @@ export type CollectionResponses = {
 	_superusers: SuperusersResponse
 	addon_services: AddonServicesResponse
 	admin_business_overview: AdminBusinessOverviewResponse
+	agency_call_slots: AgencyCallSlotsResponse
 	agency_campaigns: AgencyCampaignsResponse
 	agency_leads: AgencyLeadsResponse
 	agency_members: AgencyMembersResponse

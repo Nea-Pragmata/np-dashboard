@@ -3,6 +3,9 @@ import adapter from '@sveltejs/adapter-auto';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
+// Config runs in Node; declare `process` locally so svelte-check needn't pull in @types/node.
+declare const process: { env: Record<string, string | undefined> };
+
 export default defineConfig({
 	// Honour a PORT env var so preview/CI can pin the dev port; falls back to Vite's default.
 	server: process.env.PORT ? { port: Number(process.env.PORT) } : undefined,

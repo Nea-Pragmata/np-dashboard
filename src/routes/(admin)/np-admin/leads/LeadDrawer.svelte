@@ -8,15 +8,18 @@
 	import { pbError } from '$lib/utils/errors';
 	import { formatDateTime } from '$lib/utils/format';
 	import { Collections, AgencyLeadsStatusOptions } from '$lib/pocketbase-types';
-	import type { LeadRow } from './+page';
+	import type { LeadRow, CallSlotRow } from './+page';
 
 	let {
 		open = $bindable(false),
 		lead = null,
+		bookedSlot = null,
 		onsaved
 	}: {
 		open?: boolean;
 		lead?: LeadRow | null;
+		/** The call slot this lead booked, if any (shows «Booket prat»). */
+		bookedSlot?: CallSlotRow | null;
 		onsaved?: () => void;
 	} = $props();
 
@@ -99,6 +102,16 @@
 						<dt class={dtClass}>Kilde</dt>
 						<dd class={ddClass}>{SOURCE_LABELS[lead.source] ?? lead.source}</dd>
 					</div>
+					<div class="flex flex-col gap-0.5">
+						<dt class={dtClass}>Ønsket prat-tid</dt>
+						<dd class={ddClass}>{lead.call_time || '—'}</dd>
+					</div>
+					{#if bookedSlot}
+						<div class="flex flex-col gap-0.5 sm:col-span-2">
+							<dt class={dtClass}>Booket prat</dt>
+							<dd class="text-sm font-medium text-foreground">{formatDateTime(bookedSlot.starts)}</dd>
+						</div>
+					{/if}
 					<div class="flex flex-col gap-0.5 sm:col-span-2">
 						<dt class={dtClass}>Mottatt</dt>
 						<dd class={ddClass}>{formatDateTime(lead.created)}</dd>

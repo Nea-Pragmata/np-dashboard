@@ -91,6 +91,10 @@
 			won: { label: 'Vunnet', tone: 'success' },
 			lost: { label: 'Tapt', tone: 'neutral' }
 		},
+		agency_call_slots: {
+			open: { label: 'Ledig', tone: 'info' },
+			booked: { label: 'Booket', tone: 'success' }
+		},
 		waitlist_entries: {
 			waiting: { label: 'Venter', tone: 'warning' },
 			notified: { label: 'Varslet', tone: 'info' },

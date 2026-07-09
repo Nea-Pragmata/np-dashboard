@@ -9,15 +9,26 @@
 	import KpiCard from '$lib/components/shared/KpiCard.svelte';
 	import StatusBadge from '$lib/components/shared/StatusBadge.svelte';
 	import LeadDrawer from './LeadDrawer.svelte';
+	import CallSlots from './CallSlots.svelte';
 	import { formatDate } from '$lib/utils/format';
-	import { AgencyLeadsStatusOptions } from '$lib/pocketbase-types';
+	import { AgencyLeadsStatusOptions, AgencyCallSlotsStatusOptions } from '$lib/pocketbase-types';
 	import type { TableState } from '$lib/types';
 	import type { PageData } from './$types';
-	import type { LeadRow } from './+page';
+	import type { LeadRow, CallSlotRow } from './+page';
 
 	let { data }: { data: PageData } = $props();
 
 	const leads = $derived(data.leads);
+	const slots = $derived(data.slots);
+
+	// lead id → the slot that lead booked (for the drawer's «Booket prat»).
+	const bookedByLead = $derived.by(() => {
+		const map = new Map<string, CallSlotRow>();
+		for (const s of slots) {
+			if (s.status === AgencyCallSlotsStatusOptions.booked && s.lead) map.set(s.lead, s);
+		}
+		return map;
+	});
 
 	const counts = $derived({
 		total: leads.length,
@@ -154,6 +165,14 @@
 			<td class="text-text-body">{formatDate(l.created)}</td>
 		{/snippet}
 	</DataTable>
+
+	<!-- Ledige prat-tider (felles pott → «Book en prat» på nettsiden) -->
+	<CallSlots {slots} onchanged={refresh} />
 </div>
 
-<LeadDrawer bind:open={drawerOpen} lead={selectedLead} onsaved={refresh} />
+<LeadDrawer
+	bind:open={drawerOpen}
+	lead={selectedLead}
+	bookedSlot={selectedLead ? (bookedByLead.get(selectedLead.id) ?? null) : null}
+	onsaved={refresh}
+/>
