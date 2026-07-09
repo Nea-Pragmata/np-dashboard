@@ -26,6 +26,7 @@
 		columns = 5,
 		skeletonRows = 5,
 		onRetry,
+		onRowClick,
 		class: className
 	}: {
 		/** Data + lifecycle. `items` are only read when `status === 'ready'`. */
@@ -41,6 +42,13 @@
 		skeletonRows?: number;
 		/** Called by the error-state «Prøv igjen» button, when provided. */
 		onRetry?: () => void;
+		/**
+		 * When set, the whole body row is clickable (mouse) — makes the row's
+		 * hover-grey honest. Keyboard/AT users still use the interactive control
+		 * inside the row (e.g. a name button); stop propagation on any other
+		 * interactive cell (menus, links) so they don't also fire this.
+		 */
+		onRowClick?: (item: T, index: number) => void;
 		class?: string;
 	} = $props();
 
@@ -109,7 +117,14 @@
 			</thead>
 			<tbody>
 				{#each state.items as item, i (i)}
-					<tr class={bodyRow}>{@render row(item, i)}</tr>
+					{#if onRowClick}
+						<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+						<tr class={cn(bodyRow, 'cursor-pointer')} onclick={() => onRowClick(item, i)}>
+							{@render row(item, i)}
+						</tr>
+					{:else}
+						<tr class={bodyRow}>{@render row(item, i)}</tr>
+					{/if}
 				{/each}
 			</tbody>
 		</table>

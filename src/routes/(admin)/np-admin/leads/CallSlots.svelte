@@ -155,12 +155,12 @@
 	{:else}
 		<ul class="flex flex-col divide-y divide-border rounded-lg border border-border">
 			{#each slots as slot (slot.id)}
-				<li class="flex items-center gap-3 px-3 py-2.5">
+				<li class="flex items-center gap-1 px-1.5 py-1">
 					<button
 						type="button"
 						onclick={() => openEdit(slot)}
 						aria-label="Rediger prat-tid {formatDateTime(slot.starts)}"
-						class="-mx-1 flex min-w-0 flex-1 items-center gap-3 rounded-md px-1 py-0.5 text-left outline-none hover:text-accent-blue-text focus-visible:ring-2 focus-visible:ring-ring"
+						class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-md px-2 py-1.5 text-left outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
 					>
 						<Clock class="size-4 shrink-0 text-text-subtle" />
 						<span class="min-w-0 flex-1 text-sm tabular-nums text-foreground">
@@ -169,14 +169,14 @@
 								<span class="text-muted-foreground"> · {leadName(slot)}</span>
 							{/if}
 						</span>
+						<StatusBadge collection="agency_call_slots" status={slot.status} />
 					</button>
-					<StatusBadge collection="agency_call_slots" status={slot.status} />
 					<button
 						type="button"
 						onclick={() => requestRemove(slot)}
 						disabled={!!removingId}
 						aria-label="Fjern tid {formatDateTime(slot.starts)}"
-						class="flex size-8 items-center justify-center rounded-md text-text-subtle outline-none transition-colors hover:bg-muted hover:text-error focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+						class="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-text-subtle outline-none transition-colors hover:bg-muted hover:text-error focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default disabled:opacity-50"
 					>
 						<Trash2 class="size-4" />
 					</button>

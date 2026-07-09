@@ -160,6 +160,7 @@
 		state={tableState}
 		columns={6}
 		onRetry={refresh}
+		onRowClick={(l) => openLead(l)}
 		empty={leads.length === 0
 			? {
 					icon: Inbox,
@@ -198,6 +199,7 @@
 					<DropdownMenu.Trigger
 						disabled={changingId === l.id}
 						aria-label="Endre status for {l.name}"
+						onclick={(e) => e.stopPropagation()}
 						class="group flex items-center gap-1 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
 					>
 						<StatusBadge collection="agency_leads" status={l.status} />
