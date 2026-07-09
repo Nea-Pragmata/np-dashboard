@@ -117,7 +117,8 @@
 	<header class="min-w-0">
 		<h1 class="text-2xl font-semibold text-foreground">Leads</h1>
 		<p class="mt-1 text-sm text-muted-foreground">
-			Henvendelser fra byråets nettside — nye kunder som tar kontakt.
+			Henvendelser fra byråets nettside — nye kunder som tar kontakt. Klikk en lead for å lese
+			meldingen, tildele ansvarlig og skrive notat.
 		</p>
 	</header>
 
@@ -184,7 +185,7 @@
 				<button
 					type="button"
 					onclick={() => openLead(l)}
-					class="-mx-2 rounded-md px-2 py-1 text-left font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+					class="-mx-2 rounded-md px-2 py-1 text-left font-medium text-foreground underline decoration-border decoration-1 underline-offset-4 outline-none transition-colors hover:text-accent-blue-text hover:decoration-accent-blue-text focus-visible:ring-2 focus-visible:ring-ring"
 				>
 					{l.name}
 				</button>
