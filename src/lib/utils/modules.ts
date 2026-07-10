@@ -33,6 +33,20 @@ export const MODULE_KEYS = [
 
 export type ModuleKey = (typeof MODULE_KEYS)[number];
 
+/** Norwegian label per operational module key (MODULE_KEYS order). One source for all module UIs. */
+export const MODULE_LABELS: Record<ModuleKey, string> = {
+	booking: 'Booking',
+	catalog: 'Katalog',
+	inquiries: 'Henvendelser',
+	customers: 'Kunder & lojalitet',
+	campaigns: 'Kampanjer',
+	links: 'Lenker',
+	social: 'Sosiale medier',
+	ads: 'Annonser',
+	reviews: 'Anmeldelser',
+	waitlist: 'Venteliste'
+};
+
 /** Shape of the `businesses.modules` JSON field. */
 export type BusinessModules = Partial<Record<ModuleKey, boolean>>;
 

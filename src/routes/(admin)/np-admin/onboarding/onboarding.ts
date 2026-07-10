@@ -15,19 +15,8 @@ export const BUSINESS_TYPE_OPTIONS = [
 	{ value: BusinessesTypeOptions.annet, label: 'Annet' }
 ] as const;
 
-/** Norwegian label per operational module key (MODULE_KEYS order). */
-export const MODULE_LABELS: Record<ModuleKey, string> = {
-	booking: 'Booking',
-	catalog: 'Katalog',
-	inquiries: 'Henvendelser',
-	customers: 'Kunder & lojalitet',
-	campaigns: 'Kampanjer',
-	links: 'Lenker',
-	social: 'Sosiale medier',
-	ads: 'Annonser',
-	reviews: 'Anmeldelser',
-	waitlist: 'Venteliste'
-};
+/** Norwegian module labels — re-exported from modules.ts so the onboarding page imports from one place. */
+export { MODULE_LABELS } from '$lib/utils/modules';
 
 /** A full `businesses.modules` record with every key set to `false`. */
 export function emptyModules(): Record<ModuleKey, boolean> {

@@ -1,4 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
+import { isNetworkError, NETWORK_MESSAGE } from '$lib/utils/errors';
 import { ClientResponseError } from 'pocketbase';
 import { pb } from '$lib/pb';
 import {
@@ -8,15 +9,10 @@ import {
 } from '$lib/pocketbase-types';
 import type { PageLoad } from './$types';
 
-const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
-
 /**
  * PocketBase surfaces an unreachable server as a ClientResponseError with a
  * falsy status (the request never received an HTTP response).
  */
-function isNetworkError(e: unknown): boolean {
-	return e instanceof ClientResponseError && !e.status;
-}
 
 /**
  * Load Google/Facebook reviews for the active business, newest post first, plus

@@ -1,4 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
+import { isNetworkError, NETWORK_MESSAGE } from '$lib/utils/errors';
 import { ClientResponseError } from 'pocketbase';
 import { pb } from '$lib/pb';
 import {
@@ -15,8 +16,6 @@ import type { OpeningHours } from '../../booking/week';
 import { DEFAULT_FANE, isFaneSlug } from '../fanes';
 import type { PageLoad } from './$types';
 
-const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
-
 /** Business with a typed `opening_hours` blob (same shape Booking edits). */
 export type SettingsBusiness = BusinessesResponse<unknown, OpeningHours>;
 
@@ -27,10 +26,6 @@ export type SubscriptionExpand = {
 	campaign?: AgencyCampaignsResponse;
 };
 export type SettingsSubscription = SubscriptionsResponse<SubscriptionExpand>;
-
-function isNetworkError(e: unknown): boolean {
-	return e instanceof ClientResponseError && !e.status;
-}
 
 /** Resolve a 404 (no subscription row yet) to null; re-throw everything else. */
 async function firstOrNull<T>(promise: Promise<T>): Promise<T | null> {

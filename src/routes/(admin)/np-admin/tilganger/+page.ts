@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { ClientResponseError } from 'pocketbase';
+import { isNetworkError, NETWORK_MESSAGE } from '$lib/utils/errors';
 import { pb } from '$lib/pb';
 import {
 	Collections,
@@ -13,12 +13,6 @@ import type { PageLoad } from './$types';
 export type MemberRow = AgencyMembersResponse<{ user?: UsersResponse }>;
 /** Minimal business shape for the scope multi-select + id→name map. */
 export type BusinessRow = Pick<BusinessesResponse, 'id' | 'name'>;
-
-const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
-
-function isNetworkError(e: unknown): boolean {
-	return e instanceof ClientResponseError && !e.status;
-}
 
 /**
  * Load the agency access list: every `agency_members` row (with its user

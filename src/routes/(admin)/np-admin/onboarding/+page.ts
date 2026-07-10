@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { ClientResponseError } from 'pocketbase';
+import { isNetworkError, NETWORK_MESSAGE } from '$lib/utils/errors';
 import { pb } from '$lib/pb';
 import {
 	Collections,
@@ -12,12 +12,6 @@ import type { PageLoad } from './$types';
 /** A package whose `default_modules` is the JSON array of module keys. */
 export type PackageRow = PackagesResponse<ModuleKey[], string[]>;
 export type AddonRow = AddonServicesResponse;
-
-const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
-
-function isNetworkError(e: unknown): boolean {
-	return e instanceof ClientResponseError && !e.status;
-}
 
 /**
  * Load the published packages + add-on services that back the onboarding picker.

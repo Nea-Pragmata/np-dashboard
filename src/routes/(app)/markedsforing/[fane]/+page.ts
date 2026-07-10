@@ -1,4 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
+import { isNetworkError, NETWORK_MESSAGE } from '$lib/utils/errors';
 import { ClientResponseError } from 'pocketbase';
 import { pb } from '$lib/pb';
 import { Collections } from '$lib/pocketbase-types';
@@ -16,12 +17,7 @@ import {
 } from '../marketing';
 import type { PageLoad } from './$types';
 
-const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
-
 /** A dead server surfaces as a ClientResponseError with a falsy status. */
-function isNetworkError(e: unknown): boolean {
-	return e instanceof ClientResponseError && !e.status;
-}
 
 /** Redirect target when the requested fane is invalid or module-gated off. */
 function fallbackFane(modules: unknown): string {

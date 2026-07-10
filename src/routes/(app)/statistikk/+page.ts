@@ -1,4 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
+import { isNetworkError, NETWORK_MESSAGE } from '$lib/utils/errors';
 import { ClientResponseError } from 'pocketbase';
 import { pb } from '$lib/pb';
 import {
@@ -23,7 +24,6 @@ export type SourceRow = { label: string; count: number; pct: number };
 /** A booked-service tally. */
 export type ServiceRow = { label: string; count: number };
 
-const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
 const DAY_MS = 86_400_000;
 const WINDOW_DAYS = 30;
 
@@ -33,10 +33,6 @@ const AXIS_FMT = new Intl.DateTimeFormat('nb-NO', {
 	month: 'long',
 	timeZone: 'UTC'
 });
-
-function isNetworkError(e: unknown): boolean {
-	return e instanceof ClientResponseError && !e.status;
-}
 
 /** Resolve a `getFirstListItem` to null on 404 (no row yet); rethrow otherwise. */
 async function firstOrNull<T>(promise: Promise<T>): Promise<T | null> {

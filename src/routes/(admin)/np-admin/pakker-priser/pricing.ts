@@ -5,27 +5,13 @@
  * default-modules checkbox set, and the computed monthly subscription price.
  */
 import { formatKr, formatNumber } from '$lib/utils/format';
-import { MODULE_KEYS, type ModuleKey } from '$lib/utils/modules';
+import { MODULE_KEYS, MODULE_LABELS } from '$lib/utils/modules';
 import {
 	AddonServicesPriceTypeOptions,
 	AgencyCampaignsDiscountTypeOptions,
 	SubscriptionsBillingIntervalOptions
 } from '$lib/pocketbase-types';
 import type { StatusTone } from '$lib/components/shared/StatusBadge.svelte';
-
-/** Norwegian label per operational module key (for the package default-modules editor). */
-export const MODULE_LABELS: Record<ModuleKey, string> = {
-	booking: 'Booking',
-	catalog: 'Katalog',
-	inquiries: 'Henvendelser',
-	customers: 'Kunder & lojalitet',
-	campaigns: 'Kampanjer',
-	links: 'Lenker',
-	social: 'Sosiale medier',
-	ads: 'Annonser',
-	reviews: 'Anmeldelser',
-	waitlist: 'Venteliste'
-};
 
 /** All module keys with their labels, in canonical order. */
 export const MODULE_META = MODULE_KEYS.map((key) => ({ key, label: MODULE_LABELS[key] }));
@@ -110,14 +96,8 @@ export function campaignStatusMeta(from?: string, to?: string, now: Date = new D
 	return { label: 'Aktiv', tone: 'success' };
 }
 
-/** Tone → NP badge classes, mirroring StatusBadge's palette (which we can't edit). */
-export const TONE_BADGE: Record<StatusTone, string> = {
-	success: 'bg-success-bg text-success',
-	warning: 'bg-warning-bg text-warning',
-	error: 'bg-error-bg text-error',
-	info: 'bg-accent-blue-bg text-accent-blue-text',
-	neutral: 'bg-muted text-muted-foreground'
-};
+/** Tone → NP badge classes — re-exported from StatusBadge so the palette lives in one place. */
+export { TONE_CLASS as TONE_BADGE } from '$lib/components/shared/StatusBadge.svelte';
 
 /** Billing-interval choices for the subscription drawer select. */
 export const INTERVAL_OPTIONS = [

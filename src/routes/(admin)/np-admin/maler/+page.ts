@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { ClientResponseError } from 'pocketbase';
+import { isNetworkError, NETWORK_MESSAGE } from '$lib/utils/errors';
 import { pb } from '$lib/pb';
 import {
 	Collections,
@@ -14,12 +14,6 @@ export type TemplateRow = ContentTemplatesResponse<{ business?: BusinessesRespon
 /** An attribute schema with its owning business expanded (for the overview). */
 export type SchemaRow = AttributeSchemasResponse<unknown, { business?: BusinessesResponse }>;
 export type BusinessRow = BusinessesResponse;
-
-const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
-
-function isNetworkError(e: unknown): boolean {
-	return e instanceof ClientResponseError && !e.status;
-}
 
 /**
  * Load the agency template library: `content_templates` (global `business = ""`

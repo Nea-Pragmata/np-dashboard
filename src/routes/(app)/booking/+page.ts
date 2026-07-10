@@ -1,5 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
-import { ClientResponseError } from 'pocketbase';
+import { isNetworkError, NETWORK_MESSAGE } from '$lib/utils/errors';
 import { pb } from '$lib/pb';
 import {
 	Collections,
@@ -12,8 +12,6 @@ import {
 import { weekStart, addDays, isoDate, parseIsoDate } from './week';
 import type { PageLoad } from './$types';
 
-const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
-
 /** A booking with product/staff/customer/resource expanded. */
 export type WeekBooking = BookingsResponse<{
 	product?: ProductsResponse;
@@ -21,10 +19,6 @@ export type WeekBooking = BookingsResponse<{
 	customer?: CustomersResponse;
 	resource?: ResourcesResponse;
 }>;
-
-function isNetworkError(e: unknown): boolean {
-	return e instanceof ClientResponseError && !e.status;
-}
 
 /**
  * Load one week of bookings for the active business, plus the reference lists the

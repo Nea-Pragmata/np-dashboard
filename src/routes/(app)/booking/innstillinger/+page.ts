@@ -1,5 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
-import { ClientResponseError } from 'pocketbase';
+import { isNetworkError, NETWORK_MESSAGE } from '$lib/utils/errors';
 import { pb } from '$lib/pb';
 import {
 	Collections,
@@ -10,8 +10,6 @@ import {
 } from '$lib/pocketbase-types';
 import type { OpeningHours } from '../week';
 import type { PageLoad } from './$types';
-
-const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
 
 /** `booking_settings.reminders` shape (per fasit v2). */
 export type Reminders = {
@@ -35,10 +33,6 @@ export type WaitlistConfig = {
 
 export type SettingsRow = BookingSettingsResponse<Deposit, Reminders, WaitlistConfig>;
 export type ResourceRow = ResourcesResponse<{ staff?: UsersResponse }>;
-
-function isNetworkError(e: unknown): boolean {
-	return e instanceof ClientResponseError && !e.status;
-}
 
 /**
  * Load the booking-settings view for the active business:

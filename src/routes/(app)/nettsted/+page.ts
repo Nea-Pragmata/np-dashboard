@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { isNetworkError, NETWORK_MESSAGE } from '$lib/utils/errors';
 import { ClientResponseError } from 'pocketbase';
 import { pb } from '$lib/pb';
 import {
@@ -11,8 +12,6 @@ import {
 } from '$lib/pocketbase-types';
 import type { PageLoad } from './$types';
 
-const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
-
 /** Shape of the automated-run `findings` JSON the customer is allowed to see. */
 type JobRunFindings = { summary?: string; drafts?: number; suggestions?: string[] };
 
@@ -23,9 +22,6 @@ export type ClientJobRun = AiJobRunsResponse<JobRunFindings, { job?: AiJobsRespo
  * PocketBase surfaces an unreachable server as a ClientResponseError with a
  * falsy status (the request never received an HTTP response).
  */
-function isNetworkError(e: unknown): boolean {
-	return e instanceof ClientResponseError && !e.status;
-}
 
 /**
  * Load the always-on «Nettsted & SEO» surface for the active business:

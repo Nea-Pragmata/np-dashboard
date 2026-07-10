@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { ClientResponseError } from 'pocketbase';
+import { isNetworkError, NETWORK_MESSAGE } from '$lib/utils/errors';
 import { pb } from '$lib/pb';
 import {
 	Collections,
@@ -22,12 +22,6 @@ export type SubRow = SubscriptionsResponse<{
 	package?: PackageRow;
 }>;
 export type BusinessRow = Pick<BusinessesResponse, 'id' | 'name'>;
-
-const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
-
-function isNetworkError(e: unknown): boolean {
-	return e instanceof ClientResponseError && !e.status;
-}
 
 /**
  * Load the agency price book: packages, add-on services, campaigns (all

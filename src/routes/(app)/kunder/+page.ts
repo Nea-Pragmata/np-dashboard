@@ -1,10 +1,9 @@
 import { error, redirect } from '@sveltejs/kit';
+import { isNetworkError, NETWORK_MESSAGE } from '$lib/utils/errors';
 import { ClientResponseError } from 'pocketbase';
 import { pb } from '$lib/pb';
 import { Collections, type CustomersResponse } from '$lib/pocketbase-types';
 import type { PageLoad } from './$types';
-
-const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
 
 /** Shape of `customers.punch_card` — the loyalty («klippekort») JSON. */
 export type PunchCard = {
@@ -30,9 +29,6 @@ export type CustomerRow = CustomersResponse<Consents, PunchCard>;
  * PocketBase surfaces an unreachable server as a ClientResponseError with a
  * falsy status (the request never received an HTTP response).
  */
-function isNetworkError(e: unknown): boolean {
-	return e instanceof ClientResponseError && !e.status;
-}
 
 /**
  * Load the customer register for the active business, newest visit first (the

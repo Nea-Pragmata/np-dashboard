@@ -1,4 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
+import { isNetworkError, NETWORK_MESSAGE } from '$lib/utils/errors';
 import { ClientResponseError } from 'pocketbase';
 import { pb } from '$lib/pb';
 import {
@@ -10,15 +11,10 @@ import {
 import type { PageLoad } from './$types';
 import type { CustomerRow } from '../+page';
 
-const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
 const NOT_FOUND_MESSAGE = 'Fant ikke kunden';
 
 /** A booking with its product expanded (for the history detail + amount). */
 export type CustomerBooking = BookingsResponse<{ product?: ProductsResponse }>;
-
-function isNetworkError(e: unknown): boolean {
-	return e instanceof ClientResponseError && !e.status;
-}
 
 /**
  * Load one customer's «kundekort»: the customer record plus its related bookings

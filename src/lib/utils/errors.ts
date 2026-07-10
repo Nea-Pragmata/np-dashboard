@@ -1,6 +1,14 @@
 import { ClientResponseError } from 'pocketbase';
 
-const NETWORK = 'Får ikke kontakt med serveren';
+/** Bokmål message for a request that never reached PocketBase (used by `+page.ts` loads). */
+export const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
+
+/** True when the error is a PocketBase request that never reached the server (status 0). */
+export function isNetworkError(e: unknown): boolean {
+	return e instanceof ClientResponseError && !e.status;
+}
+
+const NETWORK = NETWORK_MESSAGE;
 const FORBIDDEN = 'Du har ikke tilgang';
 const NOT_FOUND = 'Fant ikke innholdet';
 const GENERIC = 'Noe gikk galt. Prøv igjen.';

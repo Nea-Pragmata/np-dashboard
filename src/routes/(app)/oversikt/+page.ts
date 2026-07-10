@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { isNetworkError, NETWORK_MESSAGE } from '$lib/utils/errors';
 import { ClientResponseError } from 'pocketbase';
 import { pb } from '$lib/pb';
 import {
@@ -21,15 +22,10 @@ export type TodayBooking = BookingsResponse<{
 	customer?: CustomersResponse;
 }>;
 
-const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
-
 /**
  * PocketBase surfaces an unreachable server as a ClientResponseError with a
  * falsy status (the request never received an HTTP response).
  */
-function isNetworkError(e: unknown): boolean {
-	return e instanceof ClientResponseError && !e.status;
-}
 
 /**
  * Resolve a `getFirstListItem` read to `null` on 404 (no row yet) while letting

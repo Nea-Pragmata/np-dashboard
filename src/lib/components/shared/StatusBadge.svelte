@@ -103,7 +103,8 @@
 		}
 	};
 
-	const TONE_CLASS: Record<StatusTone, string> = {
+	/** Semantic tone → NP badge classes. Exported so routes render tone chips consistently. */
+	export const TONE_CLASS: Record<StatusTone, string> = {
 		success: 'bg-success-bg text-success',
 		warning: 'bg-warning-bg text-warning',
 		error: 'bg-error-bg text-error',

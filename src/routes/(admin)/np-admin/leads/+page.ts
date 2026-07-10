@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { ClientResponseError } from 'pocketbase';
+import { isNetworkError, NETWORK_MESSAGE } from '$lib/utils/errors';
 import { pb } from '$lib/pb';
 import {
 	Collections,
@@ -16,12 +16,6 @@ export type LeadRow = AgencyLeadsResponse<{ assigned_to?: UsersResponse }>;
 export type CallSlotRow = AgencyCallSlotsResponse<{ lead?: AgencyLeadsResponse }>;
 /** An assignable agency person (for the «Ansvarlig» picker). */
 export type Person = { id: string; name: string };
-
-const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
-
-function isNetworkError(e: unknown): boolean {
-	return e instanceof ClientResponseError && !e.status;
-}
 
 /**
  * Load the agency's own inbound leads (contact requests from the byrå website),

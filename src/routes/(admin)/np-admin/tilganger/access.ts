@@ -39,14 +39,8 @@ export function memberStatusMeta(status: string): StatusMeta {
 	return STATUS_META[status] ?? { label: status, tone: 'neutral' };
 }
 
-/** Tone → NP badge classes, mirroring StatusBadge's palette (which we can't edit). */
-export const TONE_BADGE: Record<StatusTone, string> = {
-	success: 'bg-success-bg text-success',
-	warning: 'bg-warning-bg text-warning',
-	error: 'bg-error-bg text-error',
-	info: 'bg-accent-blue-bg text-accent-blue-text',
-	neutral: 'bg-muted text-muted-foreground'
-};
+/** Tone → NP badge classes — re-exported from StatusBadge so the palette lives in one place. */
+export { TONE_CLASS as TONE_BADGE } from '$lib/components/shared/StatusBadge.svelte';
 
 /**
  * Scope summary for `allowed_businesses`: an EMPTY list means access to ALL

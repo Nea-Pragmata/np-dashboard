@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { ClientResponseError } from 'pocketbase';
+import { isNetworkError, NETWORK_MESSAGE } from '$lib/utils/errors';
 import { pb } from '$lib/pb';
 import {
 	Collections,
@@ -21,12 +21,6 @@ export type JobRow = AiJobsResponse<JobNotifications, { businesses?: BusinessesR
 /** An immutable job run (read-only history). */
 export type RunRow = AiJobRunsResponse;
 export type BusinessRow = BusinessesResponse;
-
-const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
-
-function isNetworkError(e: unknown): boolean {
-	return e instanceof ClientResponseError && !e.status;
-}
 
 /**
  * Load the agency AI-jobs board: the `ai_jobs` configs (with their target

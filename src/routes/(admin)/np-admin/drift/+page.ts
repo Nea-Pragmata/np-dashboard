@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { ClientResponseError } from 'pocketbase';
+import { isNetworkError, NETWORK_MESSAGE } from '$lib/utils/errors';
 import { pb } from '$lib/pb';
 import {
 	Collections,
@@ -14,12 +14,6 @@ export type SiteStatusRow = SiteStatusResponse<{ business: BusinessesResponse }>
 
 /** An agency task with its (optional) business expanded. */
 export type TaskRow = AgencyTasksResponse<{ business?: BusinessesResponse }>;
-
-const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
-
-function isNetworkError(e: unknown): boolean {
-	return e instanceof ClientResponseError && !e.status;
-}
 
 /**
  * Load the cross-business operations overview: per-business `site_status`

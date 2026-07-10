@@ -10,23 +10,11 @@
 	import Target from '@lucide/svelte/icons/target';
 	import Star from '@lucide/svelte/icons/star';
 	import Clock from '@lucide/svelte/icons/clock';
-	import { MODULE_KEYS, type ModuleKey } from '$lib/utils/modules';
+	import { MODULE_KEYS, MODULE_LABELS, type ModuleKey } from '$lib/utils/modules';
 
 	type IconComponent = Component<{ class?: string }>;
 
-	// Norwegian label + icon per operational module key, in MODULE_KEYS order.
-	const MODULE_LABELS: Record<ModuleKey, string> = {
-		booking: 'Booking',
-		catalog: 'Katalog',
-		inquiries: 'Henvendelser',
-		customers: 'Kunder & lojalitet',
-		campaigns: 'Kampanjer',
-		links: 'Lenker',
-		social: 'Sosiale medier',
-		ads: 'Annonser',
-		reviews: 'Anmeldelser',
-		waitlist: 'Venteliste'
-	};
+	// Icon per operational module key, in MODULE_KEYS order (labels come from modules.ts).
 	const MODULE_ICONS: Record<ModuleKey, IconComponent> = {
 		booking: CalendarDays,
 		catalog: Package,

@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { ClientResponseError } from 'pocketbase';
+import { isNetworkError, NETWORK_MESSAGE } from '$lib/utils/errors';
 import { pb } from '$lib/pb';
 import {
 	Collections,
@@ -14,12 +14,6 @@ export type OverviewRow = AdminBusinessOverviewResponse<number>;
 
 /** Full business record — the drawer needs `modules` (+ profile fields). */
 export type BusinessRow = BusinessesResponse<BusinessModules>;
-
-const NETWORK_MESSAGE = 'Får ikke kontakt med serveren';
-
-function isNetworkError(e: unknown): boolean {
-	return e instanceof ClientResponseError && !e.status;
-}
 
 /**
  * Load every business the signed-in agency member may see. `admin_business_overview`
