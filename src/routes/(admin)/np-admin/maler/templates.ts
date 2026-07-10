@@ -33,8 +33,3 @@ export const TEMPLATE_TYPES: readonly TemplateType[] = [
 		helper: 'Standardsvar bedriften kan bruke når de svarer på anmeldelser.'
 	}
 ];
-
-/** Human label for a content-template type value. */
-export function templateTypeLabel(type: string): string {
-	return TEMPLATE_TYPES.find((t) => t.value === type)?.label ?? type;
-}
