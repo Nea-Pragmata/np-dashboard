@@ -24,9 +24,9 @@ export type SubRow = SubscriptionsResponse<{
 export type BusinessRow = Pick<BusinessesResponse, 'id' | 'name'>;
 
 /**
- * Load the agency price book: packages, add-on services, campaigns (all
- * `published`-readable and returned published-only by the API), the
- * subscriptions across the agency's businesses (agency-scoped; drives the
+ * Load the agency price book: packages, add-on services, campaigns (published
+ * and unpublished alike — agency members read the full book, the public only
+ * the published rows), the subscriptions across the agency's businesses (agency-scoped; drives the
  * per-package customer count + the Abonnementer table), and the business list
  * for the subscription editor. Reads run in parallel via SvelteKit's `fetch`; a
  * dead server → error(503).

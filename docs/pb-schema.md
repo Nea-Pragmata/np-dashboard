@@ -446,9 +446,9 @@ Legend: EB = EGEN BEDRIFT, EE = EGEN EIER, BM = BYRÅMEDLEM, BY = BYRÅ(business
 | report_settings | EB OR BY | same | BY | `(EB && @request.body.business:isset = false)` OR BY | BY |
 | integrations | BY | BY | BY | BY | BE |
 | agency_tasks | BM+scope¹ | same | same | same | same |
-| packages | `published = true` | same | BE | BE | BE |
-| addon_services | `published = true` | same | BE | BE | BE |
-| agency_campaigns | `published = true` | same | BE | BE | BE |
+| packages | `published = true` OR BM | same | BE | BE | BE |
+| addon_services | `published = true` OR BM | same | BE | BE | BE |
+| agency_campaigns | `published = true` OR BM | same | BE | BE | BE |
 | subscriptions | `business = @request.auth.business` OR BY | same | BE | BE | BE |
 | ai_jobs | BM | BM | BM | BM | BE |
 | ai_job_runs | BY OR customer branch² | same | null | null | null |

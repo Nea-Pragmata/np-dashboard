@@ -46,8 +46,8 @@
 	const showActions = $derived(isOwner);
 
 	// Local copies of the two toggle-bearing lists so an inline «på nettsiden»
-	// toggle-off doesn't make the row vanish (the API lists published-only). The
-	// lists re-seed from `data` after every invalidate.
+	// toggle renders optimistically without a full refetch. The lists re-seed
+	// from `data` after every invalidate.
 	let localPackages = $state<PackageRow[]>([]);
 	let localAddons = $state<AddonRow[]>([]);
 	$effect(() => {
