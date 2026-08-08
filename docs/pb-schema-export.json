@@ -4531,8 +4531,8 @@
   },
   {
     "id": "pbc_np_packages",
-    "listRule": "published = true",
-    "viewRule": "published = true",
+    "listRule": "published = true || (@collection.agency_members:am.user ?= @request.auth.id && @collection.agency_members:am.status ?= \"active\")",
+    "viewRule": "published = true || (@collection.agency_members:am.user ?= @request.auth.id && @collection.agency_members:am.status ?= \"active\")",
     "createRule": "@collection.agency_members:eier.user ?= @request.auth.id && @collection.agency_members:eier.status ?= \"active\" && @collection.agency_members:eier.role ?= \"owner\"",
     "updateRule": "@collection.agency_members:eier.user ?= @request.auth.id && @collection.agency_members:eier.status ?= \"active\" && @collection.agency_members:eier.role ?= \"owner\"",
     "deleteRule": "@collection.agency_members:eier.user ?= @request.auth.id && @collection.agency_members:eier.status ?= \"active\" && @collection.agency_members:eier.role ?= \"owner\"",
@@ -4685,8 +4685,8 @@
   },
   {
     "id": "pbc_np_addons",
-    "listRule": "published = true",
-    "viewRule": "published = true",
+    "listRule": "published = true || (@collection.agency_members:am.user ?= @request.auth.id && @collection.agency_members:am.status ?= \"active\")",
+    "viewRule": "published = true || (@collection.agency_members:am.user ?= @request.auth.id && @collection.agency_members:am.status ?= \"active\")",
     "createRule": "@collection.agency_members:eier.user ?= @request.auth.id && @collection.agency_members:eier.status ?= \"active\" && @collection.agency_members:eier.role ?= \"owner\"",
     "updateRule": "@collection.agency_members:eier.user ?= @request.auth.id && @collection.agency_members:eier.status ?= \"active\" && @collection.agency_members:eier.role ?= \"owner\"",
     "deleteRule": "@collection.agency_members:eier.user ?= @request.auth.id && @collection.agency_members:eier.status ?= \"active\" && @collection.agency_members:eier.role ?= \"owner\"",
@@ -4819,8 +4819,8 @@
   },
   {
     "id": "pbc_np_agency_camp",
-    "listRule": "published = true",
-    "viewRule": "published = true",
+    "listRule": "published = true || (@collection.agency_members:am.user ?= @request.auth.id && @collection.agency_members:am.status ?= \"active\")",
+    "viewRule": "published = true || (@collection.agency_members:am.user ?= @request.auth.id && @collection.agency_members:am.status ?= \"active\")",
     "createRule": "@collection.agency_members:eier.user ?= @request.auth.id && @collection.agency_members:eier.status ?= \"active\" && @collection.agency_members:eier.role ?= \"owner\"",
     "updateRule": "@collection.agency_members:eier.user ?= @request.auth.id && @collection.agency_members:eier.status ?= \"active\" && @collection.agency_members:eier.role ?= \"owner\"",
     "deleteRule": "@collection.agency_members:eier.user ?= @request.auth.id && @collection.agency_members:eier.status ?= \"active\" && @collection.agency_members:eier.role ?= \"owner\"",

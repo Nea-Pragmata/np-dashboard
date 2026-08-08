@@ -15,12 +15,13 @@ export type AddonRow = AddonServicesResponse;
 
 /**
  * Load the published packages + add-on services that back the onboarding picker.
- * Both collections are agency-readable published-only (the API rules already
- * enforce `published = true`). Reads run in parallel via SvelteKit's `fetch`; a
- * dead server → error(503).
+ * Agency members can read unpublished rows too (see the price book), so the
+ * published-only filter is explicit here — you onboard onto what the website
+ * actually sells. Reads run in parallel via SvelteKit's `fetch`; a dead server
+ * → error(503).
  */
 export const load: PageLoad = async ({ fetch }) => {
-	const common = { requestKey: null, fetch } as const;
+	const common = { requestKey: null, filter: 'published = true', fetch } as const;
 	try {
 		const [packages, addons] = await Promise.all([
 			pb.collection(Collections.Packages).getFullList<PackageRow>({ sort: 'sort_order', ...common }),
