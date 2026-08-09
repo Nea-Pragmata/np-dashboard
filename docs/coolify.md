@@ -8,6 +8,7 @@ To ressurser: PocketBase (data) og dashbordet (statisk SPA). Sett opp PocketBase
 - Sett domene, f.eks. `https://pb.dittdomene.no` (Coolify ordner TLS via Let's Encrypt).
 - Verifiser at tjenesten har et persistent volum på `/pb_data` (one-click-malen lager dette — uten det mister du databasen ved redeploy).
 - Åpne `https://pb.dittdomene.no/_/`, opprett superbruker, og importer skjemaet (se `docs/pb-schema.md`).
+- **Slå på Batch API** under *Settings → Batch API* — av som standard på en fersk PocketBase. Onboarding oppretter bedrift + eier + abonnement i én transaksjon via `/api/batch`; er den av, svarer PocketBase 403 og «Opprett bedrift» feiler. «Lagre som utkast» bruker ikke batch og virker uansett, så symptomet ser ut som et rettighetsproblem uten å være det.
 
 ## 2. Dashbordet
 

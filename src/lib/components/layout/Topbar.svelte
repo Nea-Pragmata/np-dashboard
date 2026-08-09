@@ -23,25 +23,36 @@
 >
 	<p class="min-w-0 flex-1 truncate text-base font-semibold text-foreground">{title}</p>
 
-	<!-- Search affordance — visual only for now (⌘K wired in a later milestone). -->
+	<!--
+		Search affordance — not wired to anything yet, so it is disabled and the ⌘K
+		hint is gone (nothing listens for that shortcut). Kept in place so the
+		layout matches Figma until the palette is built.
+	-->
 	<button
 		type="button"
 		aria-label="Søk"
-		class="hidden h-9 w-[260px] items-center gap-2 rounded-sm border border-border bg-card pl-3 pr-1.5 text-left text-muted-foreground transition-colors hover:border-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex"
+		title="Søk kommer senere"
+		disabled
+		class="hidden h-9 w-[260px] items-center gap-2 rounded-sm border border-border bg-card pl-3 pr-1.5 text-left text-muted-foreground transition-colors hover:border-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40 sm:flex"
 	>
 		<Search class="size-4 shrink-0" />
 		<span class="flex-1 truncate text-sm">Søk …</span>
-		<kbd class="rounded bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">⌘K</kbd>
 	</button>
 
-	<!-- Notifications (indicator only for now). -->
+	<!--
+		Notifications. There is no notifications collection yet, so this has nothing
+		to open and nothing to count — disabled rather than dead, and without an
+		unread dot (the previous one was hardcoded, so it announced unread items
+		that never existed).
+	-->
 	<button
 		type="button"
 		aria-label="Varsler"
-		class="relative flex size-9 shrink-0 items-center justify-center rounded-sm text-text-body transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+		title="Varsler kommer senere"
+		disabled
+		class="relative flex size-9 shrink-0 items-center justify-center rounded-sm text-text-body transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40"
 	>
 		<Bell class="size-[18px]" />
-		<span class="absolute right-2 top-2 size-1.5 rounded-full bg-accent-blue"></span>
 	</button>
 
 	<!-- User menu -->
