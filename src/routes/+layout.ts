@@ -21,11 +21,15 @@ export const load: LayoutLoad = async ({ fetch }) => {
 	if (browser && PUBLIC_POSTHOG_KEY && !PUBLIC_POSTHOG_KEY.endsWith('REPLACE_ME')) {
 		posthog.init(PUBLIC_POSTHOG_KEY, {
 			api_host: 'https://eu.i.posthog.com',
+			// `defaults` pins PostHog's recommended config baseline as of this date
+			// (a versioned defaults set — e.g. SPA history-change pageview capture).
+			// Bump it deliberately against the changelog, not casually.
+			// https://posthog.com/docs/libraries/js
 			defaults: '2026-05-30',
 			persistence: 'localStorage'
 		});
-		// Expose the instance for the documented `window.posthog.LIB_VERSION`
-		// console check (the ES-module import doesn't attach the global itself).
+		// Expose the instance for the `window.posthog.version` console check
+		// (the ES-module import doesn't attach the global itself).
 		Object.assign(window, { posthog });
 	}
 	// Pass the load `fetch` so the bootstrap PocketBase calls use SvelteKit's
