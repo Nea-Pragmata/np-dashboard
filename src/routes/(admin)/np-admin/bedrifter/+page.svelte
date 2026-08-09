@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { navigating } from '$app/state';
-	import { invalidateAll } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Search from '@lucide/svelte/icons/search';
 	import Building2 from '@lucide/svelte/icons/building-2';
@@ -208,6 +208,11 @@
 						<DropdownMenu.Content align="end">
 							<DropdownMenu.Item onSelect={() => openBusiness(b)}>Åpne</DropdownMenu.Item>
 							<DropdownMenu.Item onSelect={() => openBusiness(b)}>Rediger moduler</DropdownMenu.Item>
+							{#if b.status === BusinessesStatusOptions.onboarding}
+								<DropdownMenu.Item onSelect={() => goto(`/np-admin/onboarding?bedrift=${b.id}`)}>
+									Fullfør onboarding
+								</DropdownMenu.Item>
+							{/if}
 						</DropdownMenu.Content>
 					</DropdownMenu.Root>
 				</div>

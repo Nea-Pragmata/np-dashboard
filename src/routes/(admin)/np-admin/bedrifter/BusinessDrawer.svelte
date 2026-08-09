@@ -71,6 +71,16 @@
 	];
 	const statusLabel = $derived(STATUS_OPTIONS.find((s) => s.value === status)?.label ?? 'Aktiv');
 
+	// A draft has no owner user and no subscription yet, so it must not be flipped
+	// live from here — «Aktiv» is dropped and activation goes through the prefilled
+	// onboarding screen, which creates both in one transaction.
+	const isDraft = $derived(business?.status === BusinessesStatusOptions.onboarding);
+	const statusOptions = $derived(
+		isDraft
+			? STATUS_OPTIONS.filter((s) => s.value !== BusinessesStatusOptions.active)
+			: STATUS_OPTIONS
+	);
+
 	// --- working copy --------------------------------------------------------
 	// Seed every module key up front so the Switch `bind:checked` always has a
 	// boolean lvalue — an empty {} would bind `undefined` and abort mounting.
@@ -168,13 +178,25 @@
 					<Select.Root type="single" bind:value={status}>
 						<Select.Trigger class="w-[220px]">{statusLabel}</Select.Trigger>
 						<Select.Content>
-							{#each STATUS_OPTIONS as opt (opt.value)}
+							{#each statusOptions as opt (opt.value)}
 								<Select.Item value={opt.value} label={opt.label}>{opt.label}</Select.Item>
 							{/each}
 						</Select.Content>
 					</Select.Root>
 					<StatusBadge collection="businesses" {status} />
 				</div>
+				{#if isDraft}
+					<p class="text-sm text-muted-foreground">
+						Utkastet mangler eier og abonnement. Fullfør onboarding for å aktivere bedriften.
+					</p>
+					<Button
+						variant="outline"
+						href="/np-admin/onboarding?bedrift={business.id}"
+						class="mt-1 self-start"
+					>
+						Fullfør onboarding
+					</Button>
+				{/if}
 			</section>
 
 			<!-- Modulstyring -->
