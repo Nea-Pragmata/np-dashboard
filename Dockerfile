@@ -14,7 +14,12 @@ ENV PUBLIC_PB_URL=$PUBLIC_PB_URL
 ENV PUBLIC_POSTHOG_KEY=$PUBLIC_POSTHOG_KEY
 
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+# --ignore-scripts: skip native postinstall builds. The only one is
+# better-sqlite3 (transitive via the pocketbase-typegen dev tool) — a Node
+# addon needing Python/gcc that this alpine image lacks and the frontend build
+# never imports. vite build re-runs `svelte-kit sync` itself, so skipping the
+# `prepare` script is fine too.
+RUN bun install --frozen-lockfile --ignore-scripts
 COPY . .
 RUN bun run build
 
