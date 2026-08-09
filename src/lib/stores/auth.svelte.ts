@@ -127,7 +127,12 @@ class AuthStore {
 		this.user = { ...record };
 		// Identify here (not in login/init) since every auth-populate path —
 		// fresh login, reload refresh, cross-tab change — routes through this sync.
-		posthog.identify(record.id, { email: record.email, name: record.name });
+		// Gated on opt-in: identify() sends email/name (personal data), which must not
+		// leave the cookieless baseline. On opt-in the consent store identifies the
+		// current user directly, so this covers reloads/cross-tab once granted.
+		if (posthog.has_opted_in_capturing()) {
+			posthog.identify(record.id, { email: record.email, name: record.name });
+		}
 		await Promise.all([this.#loadBusiness(record), this.#loadAgencyMember(record)]);
 	}
 
