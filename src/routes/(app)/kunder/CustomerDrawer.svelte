@@ -4,6 +4,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import Drawer from '$lib/components/shared/Drawer.svelte';
 	import { toast } from 'svelte-sonner';
+	import posthog from 'posthog-js';
 	import { pb } from '$lib/pb';
 	import { Collections } from '$lib/pocketbase-types';
 	import { pbError } from '$lib/utils/errors';
@@ -86,7 +87,7 @@
 				toast.success('Kunden er lagret.');
 			} else {
 				const consents: Consents = { email: false, sms: false };
-				await pb.collection(Collections.Customers).create({
+				const created = await pb.collection(Collections.Customers).create({
 					business: businessId,
 					name: name.trim(),
 					phone: phone.trim(),
@@ -94,6 +95,7 @@
 					punch_card,
 					consents
 				});
+				posthog.capture('customer_created', { customer_id: created.id });
 				toast.success('Kunden er lagt til.');
 			}
 			open = false;

@@ -10,6 +10,7 @@
 	import CircleCheckBig from '@lucide/svelte/icons/circle-check-big';
 	import XCircle from '@lucide/svelte/icons/circle-x';
 	import { toast } from 'svelte-sonner';
+	import posthog from 'posthog-js';
 	import { pb } from '$lib/pb';
 	import {
 		Collections,
@@ -185,7 +186,8 @@
 		if (notes.trim()) payload.notes = notes.trim();
 
 		try {
-			await pb.collection(Collections.Bookings).create(payload);
+			const created = await pb.collection(Collections.Bookings).create(payload);
+			posthog.capture('booking_created', { booking_id: created.id });
 			toast.success('Avtalen er opprettet.');
 			open = false;
 			onsaved?.();

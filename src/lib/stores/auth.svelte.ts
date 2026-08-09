@@ -1,4 +1,5 @@
 import { ClientResponseError } from 'pocketbase';
+import posthog from 'posthog-js';
 import { pb } from '$lib/pb';
 import { tenant } from '$lib/stores/tenant.svelte';
 import {
@@ -90,12 +91,14 @@ class AuthStore {
 		// onChange already kicked off a sync; await one to guarantee state is
 		// populated before the caller (e.g. a redirect) runs.
 		await this.#sync();
+		posthog.capture('user_logged_in');
 	}
 
 	logout(): void {
 		pb.authStore.clear();
 		tenant.clear();
 		this.#reset();
+		posthog.reset();
 	}
 
 	/**
@@ -122,6 +125,9 @@ class AuthStore {
 		}
 		// Snapshot into state — never keep a reference to the live model.
 		this.user = { ...record };
+		// Identify here (not in login/init) since every auth-populate path —
+		// fresh login, reload refresh, cross-tab change — routes through this sync.
+		posthog.identify(record.id, { email: record.email, name: record.name });
 		await Promise.all([this.#loadBusiness(record), this.#loadAgencyMember(record)]);
 	}
 

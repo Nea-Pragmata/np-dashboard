@@ -1,3 +1,6 @@
+import posthog from 'posthog-js';
+import { browser } from '$app/environment';
+import { PUBLIC_POSTHOG_KEY } from '$env/static/public';
 import { auth } from '$lib/stores/auth.svelte';
 import type { LayoutLoad } from './$types';
 
@@ -12,6 +15,19 @@ export const ssr = false;
  * sensitive — auth state is read from the `auth` singleton, not from `data`.
  */
 export const load: LayoutLoad = async ({ fetch }) => {
+	// Analytics: client-only, cookie-free (localStorage). Guarded on the key so a
+	// missing/placeholder env just no-ops instead of throwing. auth.init() below
+	// identifies the user once the session resolves.
+	if (browser && PUBLIC_POSTHOG_KEY && !PUBLIC_POSTHOG_KEY.endsWith('REPLACE_ME')) {
+		posthog.init(PUBLIC_POSTHOG_KEY, {
+			api_host: 'https://eu.i.posthog.com',
+			defaults: '2026-05-30',
+			persistence: 'localStorage'
+		});
+		// Expose the instance for the documented `window.posthog.LIB_VERSION`
+		// console check (the ES-module import doesn't attach the global itself).
+		Object.assign(window, { posthog });
+	}
 	// Pass the load `fetch` so the bootstrap PocketBase calls use SvelteKit's
 	// instrumented fetch (avoids the dev-time "using window.fetch" warning).
 	await auth.init(fetch);

@@ -9,6 +9,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { formatNumber } from '$lib/utils/format';
 	import { pbError } from '$lib/utils/errors';
+	import posthog from 'posthog-js';
 	import { pb } from '$lib/pb';
 	import {
 		Collections,
@@ -119,7 +120,8 @@
 				// Customer update rule requires business:isset = false — never resend it.
 				await pb.collection(Collections.Campaigns).update(campaign.id, payload);
 			} else {
-				await pb.collection(Collections.Campaigns).create({ ...payload, business: businessId });
+				const created = await pb.collection(Collections.Campaigns).create({ ...payload, business: businessId });
+				posthog.capture('campaign_created', { campaign_id: created.id });
 			}
 			return true;
 		} catch (e) {
