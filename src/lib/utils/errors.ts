@@ -10,6 +10,11 @@ export function isNetworkError(e: unknown): boolean {
 
 const NETWORK = NETWORK_MESSAGE;
 const FORBIDDEN = 'Du har ikke tilgang';
+// PocketBase answers 403 «Batch requests are not allowed.» when the Batch API is
+// off — the default on a fresh install. That is a server setting, not a missing
+// permission, so the generic FORBIDDEN text points people at the wrong problem.
+const BATCH_DISABLED =
+	'Batch-API-et er slått av i PocketBase. Slå det på under Innstillinger → Batch API.';
 const NOT_FOUND = 'Fant ikke innholdet';
 const GENERIC = 'Noe gikk galt. Prøv igjen.';
 
@@ -41,7 +46,9 @@ export function pbError(e: unknown): string {
 			case 400:
 				return firstFieldMessage(e) ?? (e.message || GENERIC);
 			case 403:
-				return FORBIDDEN;
+				return e.message.startsWith('Batch requests are not allowed')
+					? BATCH_DISABLED
+					: FORBIDDEN;
 			case 404:
 				return NOT_FOUND;
 			default:
