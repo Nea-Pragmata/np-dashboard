@@ -17,9 +17,9 @@ export default defineConfig({
 				runes: ({ filename }) => filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
 
-			// The app is a client-only SPA (`ssr = false` in the root layout), served
-			// as static files behind nginx (see Dockerfile). `fallback` makes every
-			// unknown path serve index.html so client-side routing/deep links work.
+			// Pure SPA (ssr = false in the root layout): static output with an
+			// index.html fallback so deep links resolve client-side. Served by
+			// nginx in the Coolify deploy (see Dockerfile).
 			adapter: adapter({ fallback: 'index.html' })
 		})
 	]

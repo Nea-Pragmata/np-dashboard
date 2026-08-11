@@ -31,18 +31,45 @@
 	// the API rules — a byråansatt is blocked server-side). Gate the whole flow.
 	const isOwner = $derived(auth.agencyMember?.role === 'owner');
 
+	/** The saved draft being resumed via `?bedrift=<id>`, or null for a new customer. */
+	const draft = $derived(data.business);
+
 	// --- form state ----------------------------------------------------------
 	let name = $state('');
 	let type = $state<string>(BUSINESS_TYPE_OPTIONS[0].value);
 	let contactName = $state('');
 	let email = $state('');
 	let phone = $state('');
+	let orgNumber = $state('');
+	let address = $state('');
 	let packageId = $state('');
 	let modules = $state<Record<ModuleKey, boolean>>(emptyModules());
 	let addonIds = $state<string[]>([]);
 	let saving = $state(false);
 
 	const slug = $derived(slugify(name));
+
+	// Refill the form from the saved draft, once per draft — the same «lastKey»
+	// guard as BusinessDrawer, so an in-progress edit is never clobbered by a
+	// re-render. `contactName` is deliberately left blank: a draft has no owner
+	// user yet, so the agency has to supply (and thereby confirm) it before the
+	// business can go live.
+	let lastDraftId = '';
+	$effect(() => {
+		if (!draft || draft.id === lastDraftId) return;
+		lastDraftId = draft.id;
+		name = draft.name;
+		type = draft.type;
+		email = draft.contact_email ?? '';
+		phone = draft.phone ?? '';
+		orgNumber = draft.org_number ?? '';
+		address = draft.address ?? '';
+
+		const saved = draft.modules ?? {};
+		const next = emptyModules();
+		for (const key of MODULE_KEYS) next[key] = saved[key] === true;
+		modules = next;
+	});
 
 	const typeLabel = $derived(
 		BUSINESS_TYPE_OPTIONS.find((t) => t.value === type)?.label ?? 'Velg bransje'
@@ -92,22 +119,28 @@
 		if (mode === 'draft' && !canDraft) return;
 		saving = true;
 		try {
-			const bizId = generateRecordId();
-			const moduleRecord = { ...modules };
+			// Resuming a draft keeps its id, so the existing record is activated in
+			// place rather than duplicated.
+			const bizId = draft?.id ?? generateRecordId();
+			// Shared by both modes — only `status` differs.
+			const businessFields = {
+				name: trimmedName,
+				slug,
+				type,
+				contact_email: email.trim(),
+				phone: phone.trim(),
+				org_number: orgNumber.trim(),
+				address: address.trim(),
+				modules: { ...modules }
+			};
 
 			if (mode === 'draft') {
 				// A draft is the business record only (status onboarding, no owner,
-				// no subscription) — the agency finishes setup later.
-				await pb.collection(Collections.Businesses).create({
-					id: bizId,
-					name: trimmedName,
-					slug,
-					type,
-					status: 'onboarding',
-					contact_email: email.trim(),
-					phone: phone.trim(),
-					modules: moduleRecord
-				});
+				// no subscription) — the agency finishes setup later, from this same
+				// screen via `?bedrift=<id>`.
+				const body = { ...businessFields, status: 'onboarding' };
+				const businesses = pb.collection(Collections.Businesses);
+				await (draft ? businesses.update(bizId, body) : businesses.create({ ...body, id: bizId }));
 				toast.success('Lagret som utkast.');
 				await goto('/np-admin/bedrifter');
 				return;
@@ -115,19 +148,16 @@
 
 			// Full onboarding: business + owner user + subscription in one atomic
 			// batch (a client-provided business id links all three). This is the
-			// deferred subscription→modules sync, done here in the UI.
+			// deferred subscription→modules sync, done here in the UI. Activating a
+			// draft runs the very same batch — it just updates the business instead
+			// of creating it, so a draft can never go live without an owner and a
+			// subscription.
 			const password = generatePassword();
 			const batch = pb.createBatch();
-			batch.collection(Collections.Businesses).create({
-				id: bizId,
-				name: trimmedName,
-				slug,
-				type,
-				status: 'active',
-				contact_email: email.trim(),
-				phone: phone.trim(),
-				modules: moduleRecord
-			});
+			const activeBody = { ...businessFields, status: 'active' };
+			const businesses = batch.collection(Collections.Businesses);
+			if (draft) businesses.update(bizId, activeBody);
+			else businesses.create({ ...activeBody, id: bizId });
 			batch.collection(Collections.Users).create({
 				email: email.trim(),
 				name: contactName.trim(),
@@ -147,10 +177,10 @@
 			});
 			await batch.send();
 
-			toast.success(`${trimmedName} er opprettet.`);
+			toast.success(`${trimmedName} er ${draft ? 'aktivert' : 'opprettet'}.`);
 			await goto('/np-admin/bedrifter');
 		} catch (e) {
-			// The batch is transactional — a failure leaves no orphan records.
+			// The batch is transactional — a failure leaves the draft untouched.
 			toast.error(pbError(e) || 'Kunne ikke opprette bedriften.');
 		} finally {
 			saving = false;
@@ -162,14 +192,20 @@
 	const enabledCount = $derived(MODULE_KEYS.filter((k) => modules[k]).length);
 </script>
 
-<svelte:head><title>Onboarding · NP Admin</title></svelte:head>
+<svelte:head>
+	<title>{draft ? 'Fullfør onboarding' : 'Onboarding'} · NP Admin</title>
+</svelte:head>
 
 <div class="flex flex-col gap-6 p-4 sm:p-6 lg:p-8">
 	<!-- Header -->
 	<header class="min-w-0">
-		<h1 class="text-2xl font-semibold text-foreground">Onboarding</h1>
+		<h1 class="text-2xl font-semibold text-foreground">
+			{draft ? 'Fullfør onboarding' : 'Onboarding'}
+		</h1>
 		<p class="mt-1 text-sm text-muted-foreground">
-			Opprett en ny kunde og velg modulene de skal ha.
+			{draft
+				? 'Utkastet er fylt inn på nytt. Se over alt — kontaktperson og pakke må på plass før du kan aktivere.'
+				: 'Opprett en ny kunde og velg modulene de skal ha.'}
 		</p>
 	</header>
 
@@ -235,6 +271,27 @@
 					<div class="flex flex-col gap-1.5">
 						<Label for="ob-phone">Telefon</Label>
 						<Input id="ob-phone" name="ob-phone" bind:value={phone} placeholder="934 55 210" />
+					</div>
+
+					<div class="flex flex-col gap-1.5">
+						<Label for="ob-org">Organisasjonsnummer</Label>
+						<Input
+							id="ob-org"
+							name="ob-org"
+							inputmode="numeric"
+							bind:value={orgNumber}
+							placeholder="987 654 321"
+						/>
+					</div>
+
+					<div class="flex flex-col gap-1.5">
+						<Label for="ob-address">Adresse</Label>
+						<Input
+							id="ob-address"
+							name="ob-address"
+							bind:value={address}
+							placeholder="Kirkegata 12, 3770 Kragerø"
+						/>
 					</div>
 				</section>
 
@@ -342,10 +399,14 @@
 		<!-- Footer actions: one black primary («maks én svart primærknapp») -->
 		<div class="flex flex-wrap items-center justify-end gap-3">
 			<Button variant="outline" onclick={() => createBusiness('draft')} disabled={!canDraft}>
-				Lagre som utkast
+				{draft ? 'Lagre utkast' : 'Lagre som utkast'}
 			</Button>
 			<Button onclick={() => createBusiness('full')} disabled={!canCreate}>
-				{saving ? 'Oppretter …' : 'Opprett bedrift'}
+				{#if saving}
+					{draft ? 'Aktiverer …' : 'Oppretter …'}
+				{:else}
+					{draft ? 'Aktiver bedrift' : 'Opprett bedrift'}
+				{/if}
 			</Button>
 		</div>
 	{/if}

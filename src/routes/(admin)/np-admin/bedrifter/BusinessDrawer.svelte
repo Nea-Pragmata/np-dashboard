@@ -71,6 +71,17 @@
 	];
 	const statusLabel = $derived(STATUS_OPTIONS.find((s) => s.value === status)?.label ?? 'Aktiv');
 
+	// A draft has no owner user and no subscription yet, so its status belongs to
+	// the onboarding flow and is not editable here at all.
+	//
+	// Merely hiding «Aktiv» was not enough: `isDraft` reads the SAVED status, so
+	// saving a draft as «Pauset» made it stop counting as a draft. «Aktiv» came
+	// back on the next open, «Fullfør onboarding» vanished from both the drawer
+	// and the row menu, and the onboarding screen redirects any non-onboarding id
+	// away — leaving a business that could be forced live with no owner and no
+	// subscription, and no route back to the flow that creates them.
+	const isDraft = $derived(business?.status === BusinessesStatusOptions.onboarding);
+
 	// --- working copy --------------------------------------------------------
 	// Seed every module key up front so the Switch `bind:checked` always has a
 	// boolean lvalue — an empty {} would bind `undefined` and abort mounting.
@@ -108,7 +119,11 @@
 			// agency-only fields (a customer owner is blocked from setting them).
 			await pb.collection(Collections.Businesses).update(business.id, {
 				modules: { ...modules },
-				status
+				// A draft leaves «onboarding» only by being activated through the
+				// onboarding flow, which creates its owner and subscription in the
+				// same transaction. Pinned here too, so the rule holds even if the
+				// select above is ever re-enabled.
+				status: isDraft ? BusinessesStatusOptions.onboarding : status
 			});
 			toast.success('Endringene er lagret.');
 			open = false;
@@ -165,7 +180,7 @@
 			<section class="flex flex-col gap-2 border-t border-border pt-5">
 				<p class={sectionLabel}>Status</p>
 				<div class="flex items-center gap-3">
-					<Select.Root type="single" bind:value={status}>
+					<Select.Root type="single" bind:value={status} disabled={isDraft}>
 						<Select.Trigger class="w-[220px]">{statusLabel}</Select.Trigger>
 						<Select.Content>
 							{#each STATUS_OPTIONS as opt (opt.value)}
@@ -175,6 +190,18 @@
 					</Select.Root>
 					<StatusBadge collection="businesses" {status} />
 				</div>
+				{#if isDraft}
+					<p class="text-sm text-muted-foreground">
+						Utkastet mangler eier og abonnement. Fullfør onboarding for å aktivere bedriften.
+					</p>
+					<Button
+						variant="outline"
+						href="/np-admin/onboarding?bedrift={business.id}"
+						class="mt-1 self-start"
+					>
+						Fullfør onboarding
+					</Button>
+				{/if}
 			</section>
 
 			<!-- Modulstyring -->
