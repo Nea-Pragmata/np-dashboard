@@ -43,13 +43,6 @@ class ConsentStore {
 		posthog.opt_out_capturing();
 		this.status = 'denied';
 	}
-
-	/** Re-open the choice (e.g. from the privacy page): clears the recorded decision. */
-	reopen(): void {
-		if (typeof window === 'undefined' || !('posthog' in window)) return;
-		posthog.clear_opt_in_out_capturing();
-		this.status = 'pending';
-	}
 }
 
 export const consent = new ConsentStore();

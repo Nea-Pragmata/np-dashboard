@@ -37,7 +37,12 @@ export const load: LayoutLoad = async ({ fetch }) => {
 			// server hash mode" enabled in the PostHog project, else these events are dropped.
 			cookieless_mode: 'on_reject',
 			opt_out_capturing_by_default: true,
-			persistence: 'localStorage'
+			persistence: 'localStorage',
+			// Off: by default posthog-js autocaptures clicks/inputs with their DOM text,
+			// which in this dashboard means customer names etc. — third-party PII that
+			// must not leave the cookieless baseline (or reach PostHog at all). Only the
+			// explicit, reviewed capture() events (ids only) are sent.
+			autocapture: false
 		});
 		// Expose the instance for the `window.posthog.version` console check
 		// (the ES-module import doesn't attach the global itself).

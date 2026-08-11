@@ -38,5 +38,8 @@
 	"dependencies": {
 		"pocketbase": "^0.27.0",
 		"posthog-js": "^1.399.1"
+	},
+	"overrides": {
+		"dompurify": "^3.4.13"
 	}
 }
