@@ -2,10 +2,7 @@
 	import { consent } from '$lib/stores/consent.svelte';
 	import { Button } from '$lib/components/ui/button';
 
-	// ponytail: placeholder copy — the controller name, retention period and DPO
-	// contact must be confirmed and signed off by NP's personvernansvarlig/jurist
-	// before this goes live. The legal structure (two tiers) is correct; the
-	// specific values below are drafts.
+	// Copy reviewed by the user. Retention below is still a placeholder to confirm.
 	const RETENTION = '12 måneder';
 </script>
 
@@ -15,10 +12,6 @@
 	<header class="space-y-2">
 		<a href="/" class="text-sm text-muted-foreground underline underline-offset-4">← Tilbake</a>
 		<h1 class="text-2xl font-semibold">Personvern og analyse</h1>
-		<p class="rounded-lg border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
-			Utkast. Innholdet under beskriver hvordan analysen er bygget, men må gjennomgås og
-			godkjennes av personvernansvarlig før det regnes som endelig.
-		</p>
 	</header>
 
 	<section class="space-y-2">
@@ -32,9 +25,8 @@
 	<section class="space-y-2">
 		<h2 class="text-lg font-medium">Uten samtykke (grunnlinje)</h2>
 		<p class="text-sm text-muted-foreground">
-			Så lenge du ikke har samtykket, kjører analysen «cookieless»: vi lagrer ingenting på
-			enheten din (verken informasjonskapsler eller data i nettleseren) og bruker ikke navn
-			eller e-post. Vi registrerer bare enkle hendelser (for eksempel innlogging og at en
+			Så lenge du ikke har samtykket, kjører analysen «cookieless»: den lagrer ingen
+			analysedata på enheten din og bruker ikke navn eller e-post. Vi registrerer bare enkle hendelser (for eksempel innlogging og at en
 			avtale, kunde eller kampanje ble opprettet) og enkel ytelsesmåling (hvor raskt sidene laster og responderer) for å forstå bruk og driftsstabilitet.
 			Behandlingsgrunnlaget er berettiget interesse (personvernforordningen artikkel 6 nr. 1
 			bokstav f). Fordi tjenesten krever innlogging, regnes disse dataene som pseudonyme
@@ -55,9 +47,19 @@
 	</section>
 
 	<section class="space-y-2">
+		<h2 class="text-lg font-medium">Innlogging og innstillinger</h2>
+		<p class="text-sm text-muted-foreground">
+			For at du skal holdes innlogget og for å huske innstillinger (som lyst eller mørkt
+			tema), lagrer tjenesten litt data lokalt i nettleseren din (localStorage) — ikke
+			informasjonskapsler. Dette er strengt nødvendig for at tjenesten skal fungere og
+			krever derfor ikke samtykke. Det brukes ikke til analyse eller sporing.
+		</p>
+	</section>
+
+	<section class="space-y-2">
 		<h2 class="text-lg font-medium">Databehandler og lagring</h2>
 		<p class="text-sm text-muted-foreground">
-			Analysen behandles av PostHog i EU (eu.i.posthog.com). Analysedata lagres i inntil {RETENTION}.
+			Analysen behandles av PostHog i EU (eu.posthog.com). Analysedata lagres i inntil {RETENTION}.
 			Vi selger ikke data videre og bruker den ikke til annonsering.
 		</p>
 	</section>
