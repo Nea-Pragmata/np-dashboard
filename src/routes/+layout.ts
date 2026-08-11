@@ -42,7 +42,12 @@ export const load: LayoutLoad = async ({ fetch }) => {
 			// which in this dashboard means customer names etc. — third-party PII that
 			// must not leave the cookieless baseline (or reach PostHog at all). Only the
 			// explicit, reviewed capture() events (ids only) are sent.
-			autocapture: false
+			autocapture: false,
+			// Core Web Vitals (LCP/INP/CLS) as $web_vitals — real-user front-end
+			// performance. Timing numbers + URL only, no DOM text/PII, so it's safe in
+			// the cookieless baseline. network_timing stays off (it would capture
+			// request URLs); this is independent of `autocapture`.
+			capture_performance: { web_vitals: true, network_timing: false }
 		});
 		// Expose the instance for the `window.posthog.version` console check
 		// (the ES-module import doesn't attach the global itself).

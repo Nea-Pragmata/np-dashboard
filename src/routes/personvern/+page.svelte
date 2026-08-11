@@ -35,7 +35,7 @@
 			Så lenge du ikke har samtykket, kjører analysen «cookieless»: vi lagrer ingenting på
 			enheten din (verken informasjonskapsler eller data i nettleseren) og bruker ikke navn
 			eller e-post. Vi registrerer bare enkle hendelser (for eksempel innlogging og at en
-			avtale, kunde eller kampanje ble opprettet) for å forstå bruk og driftsstabilitet.
+			avtale, kunde eller kampanje ble opprettet) og enkel ytelsesmåling (hvor raskt sidene laster og responderer) for å forstå bruk og driftsstabilitet.
 			Behandlingsgrunnlaget er berettiget interesse (personvernforordningen artikkel 6 nr. 1
 			bokstav f). Fordi tjenesten krever innlogging, regnes disse dataene som pseudonyme
 			personopplysninger — ikke helt anonyme — og du kan når som helst protestere mot
