@@ -12,6 +12,7 @@
 	import ConfirmDialog from '$lib/components/shared/ConfirmDialog.svelte';
 	import { formatNumber, formatTime } from '$lib/utils/format';
 	import { pbError } from '$lib/utils/errors';
+	import posthog from 'posthog-js';
 	import { pb } from '$lib/pb';
 	import { Collections, CampaignsStatusOptions } from '$lib/pocketbase-types';
 	import type { TableState } from '$lib/types';
@@ -84,7 +85,7 @@
 	// --- duplicate -----------------------------------------------------------
 	async function duplicate(c: CampaignRow) {
 		try {
-			await pb.collection(Collections.Campaigns).create({
+			const created = await pb.collection(Collections.Campaigns).create({
 				business: businessId,
 				name: `${c.name} (kopi)`,
 				channel: c.channel,
@@ -94,6 +95,7 @@
 				// A copy always starts as an editable draft.
 				status: CampaignsStatusOptions.draft
 			});
+			posthog.capture('campaign_created', { campaign_id: created.id });
 			toast.success('Kampanjen er duplisert.');
 			onchanged();
 		} catch (e) {

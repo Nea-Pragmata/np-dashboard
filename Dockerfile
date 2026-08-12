@@ -6,10 +6,12 @@ COPY package.json bun.lock ./
 # only used for local typegen — never in the image). vite build runs its own sync.
 RUN bun install --frozen-lockfile --ignore-scripts
 COPY . .
-# PUBLIC_PB_URL is baked into the bundle at build time ($env/static/public).
-# In Coolify: set it as a build-time variable pointing at the public PocketBase URL.
+# PUBLIC_* are baked into the bundle at build time ($env/static/public).
+# In Coolify: set them as build-time variables (PocketBase URL + PostHog key).
 ARG PUBLIC_PB_URL
+ARG PUBLIC_POSTHOG_KEY
 ENV PUBLIC_PB_URL=$PUBLIC_PB_URL
+ENV PUBLIC_POSTHOG_KEY=$PUBLIC_POSTHOG_KEY
 RUN bun run build
 
 # Serve: nginx with SPA fallback
