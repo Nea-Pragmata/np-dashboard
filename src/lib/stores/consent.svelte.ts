@@ -40,6 +40,12 @@ class ConsentStore {
 
 	/** Decline the enhanced tier: keep the cookieless baseline, record the refusal. */
 	decline(): void {
+		// opt_out_capturing() also CLEARS the ph_* localStorage store here (not just the
+		// opt-out flag) because cookieless_mode:'on_reject' in +layout.ts makes opting out
+		// transition into cookieless mode, which runs an internal reset(true) ->
+		// persistence.clear(). So a withdraw after a prior opt-in leaves no analytics
+		// identity on-device — verified in-browser. Don't drop cookieless_mode without
+		// re-checking this guarantee (the /personvern copy promises the data is deleted).
 		posthog.opt_out_capturing();
 		this.status = 'denied';
 	}
